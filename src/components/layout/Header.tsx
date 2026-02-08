@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ShoppingBag, Menu, X, Search, User } from "lucide-react";
+import { ShoppingBag, Menu, X, Search, User, Shield } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
@@ -14,6 +15,7 @@ const navLinks = [
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { totalItems, setIsCartOpen } = useCart();
+  const { user, isAdmin } = useAuth();
   const location = useLocation();
 
   return (
@@ -66,9 +68,40 @@ const Header = () => {
             <button className="p-2 text-foreground hover:text-accent transition-colors hidden sm:block" aria-label="Search">
               <Search size={20} />
             </button>
-            <Link to="/account" className="p-2 text-foreground hover:text-accent transition-colors hidden sm:block" aria-label="Account">
+
+            {/* Admin Link */}
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="p-2 text-accent hover:text-accent/80 transition-colors hidden sm:block"
+                aria-label="Admin Panel"
+                title="Admin Panel"
+              >
+                <Shield size={20} />
+              </Link>
+            )}
+
+            {/* Admin Login Link (visible to all) */}
+            {!isAdmin && (
+              <Link
+                to="/admin-login"
+                className="p-2 text-muted-foreground hover:text-accent transition-colors hidden sm:block"
+                aria-label="Admin Login"
+                title="Admin Login"
+              >
+                <Shield size={18} />
+              </Link>
+            )}
+
+            {/* Account / Auth */}
+            <Link
+              to={user ? "/account" : "/auth"}
+              className="p-2 text-foreground hover:text-accent transition-colors hidden sm:block"
+              aria-label={user ? "Account" : "Sign In"}
+            >
               <User size={20} />
             </Link>
+
             <button
               onClick={() => setIsCartOpen(true)}
               className="p-2 text-foreground hover:text-accent transition-colors relative"
@@ -109,6 +142,20 @@ const Header = () => {
                   {link.label}
                 </Link>
               ))}
+              <Link
+                to={user ? "/account" : "/auth"}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-sm tracking-[0.15em] uppercase font-body py-2 text-foreground hover:text-accent transition-colors"
+              >
+                {user ? "My Account" : "Sign In"}
+              </Link>
+              <Link
+                to="/admin-login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-sm tracking-[0.15em] uppercase font-body py-2 text-muted-foreground hover:text-accent transition-colors flex items-center gap-2"
+              >
+                <Shield size={14} /> Admin
+              </Link>
             </nav>
           </motion.div>
         )}

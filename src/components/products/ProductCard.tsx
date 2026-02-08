@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ShoppingBag } from "lucide-react";
 import { Product, formatPrice } from "@/data/products";
+import { getProductImage } from "@/data/product-images";
 import { useCart } from "@/contexts/CartContext";
 
 interface ProductCardProps {
@@ -22,10 +23,12 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
     >
       <Link to={`/product/${product.id}`} className="block">
         <div className="relative overflow-hidden aspect-[3/4] bg-card mb-4">
-          {/* Placeholder image with emoji */}
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-card to-secondary transition-transform duration-700 group-hover:scale-105">
-            <span className="text-6xl opacity-60">🥻</span>
-          </div>
+          <img
+            src={getProductImage(product.id)}
+            alt={product.name}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            loading="lazy"
+          />
 
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-2">

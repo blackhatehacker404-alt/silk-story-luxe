@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ShoppingBag, Zap, Share2, ChevronLeft, Heart } from "lucide-react";
 import { products, formatPrice } from "@/data/products";
+import { getProductImage } from "@/data/product-images";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 
@@ -63,24 +64,19 @@ const ProductDetail = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="aspect-[3/4] bg-card flex items-center justify-center overflow-hidden group cursor-zoom-in">
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-card to-secondary transition-transform duration-500 group-hover:scale-110">
-                <span className="text-[120px] opacity-50">🥻</span>
-              </div>
+            <div className="aspect-[3/4] bg-card overflow-hidden group cursor-zoom-in">
+              <img
+                src={getProductImage(product.id)}
+                alt={product.name}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
             </div>
 
             {/* Thumbnail strip */}
             <div className="flex gap-3 mt-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={i}
-                  className={`w-20 h-24 bg-card flex items-center justify-center cursor-pointer border-2 transition-colors ${
-                    i === 1 ? "border-accent" : "border-transparent hover:border-border"
-                  }`}
-                >
-                  <span className="text-2xl opacity-40">🥻</span>
-                </div>
-              ))}
+              <div className="w-20 h-24 bg-card overflow-hidden cursor-pointer border-2 border-accent">
+                <img src={getProductImage(product.id)} alt={product.name} className="w-full h-full object-cover" />
+              </div>
             </div>
           </motion.div>
 
