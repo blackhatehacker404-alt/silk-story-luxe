@@ -38,7 +38,7 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
               </span>
             )}
             {product.isBestSeller && (
-              <span className="px-3 py-1 bg-primary text-primary-foreground text-[10px] tracking-[0.2em] uppercase font-body">
+              <span className="px-3 py-1 bg-muted text-foreground text-[10px] tracking-[0.2em] uppercase font-body">
                 Best Seller
               </span>
             )}
