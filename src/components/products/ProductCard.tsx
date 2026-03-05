@@ -33,12 +33,12 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-2">
             {product.isNew && (
-              <span className="px-3 py-1 bg-accent text-accent-foreground text-[10px] tracking-[0.2em] uppercase font-body">
+              <span className="px-3 py-1 bg-foreground text-background text-[10px] tracking-[0.2em] uppercase font-body">
                 New
               </span>
             )}
             {product.isBestSeller && (
-              <span className="px-3 py-1 bg-primary text-primary-foreground text-[10px] tracking-[0.2em] uppercase font-body">
+              <span className="px-3 py-1 bg-muted text-foreground text-[10px] tracking-[0.2em] uppercase font-body">
                 Best Seller
               </span>
             )}
@@ -69,7 +69,7 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
         </Link>
         <p className="text-xs text-muted-foreground font-body">{product.collection}</p>
         <div className="flex items-center gap-2">
-          <span className="text-sm font-heading font-semibold text-accent">
+          <span className="text-sm font-heading font-semibold text-foreground">
             {formatPrice(product.price)}
           </span>
           {product.originalPrice && (
