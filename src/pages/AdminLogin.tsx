@@ -68,7 +68,7 @@ const AdminLogin = () => {
               <Label className="text-sm font-body tracking-wide uppercase text-muted-foreground">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@sriganapathysilks.com" className="pl-10" />
+                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@kalaifashions.com" className="pl-10" />
               </div>
             </div>
             <div className="space-y-2">

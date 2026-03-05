@@ -43,6 +43,7 @@ function AppContent() {
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/admin-login" element={<AdminLogin />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/account" element={<UserDashboard />} />
 
         {/* Admin Routes */}

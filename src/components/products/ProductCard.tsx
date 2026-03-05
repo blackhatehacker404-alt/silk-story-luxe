@@ -69,7 +69,7 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
         </Link>
         <p className="text-xs text-muted-foreground font-body">{product.collection}</p>
         <div className="flex items-center gap-2">
-          <span className="text-sm font-heading font-semibold text-accent">
+          <span className="text-sm font-heading font-semibold text-foreground">
             {formatPrice(product.price)}
           </span>
           {product.originalPrice && (
