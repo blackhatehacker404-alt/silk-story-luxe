@@ -59,7 +59,7 @@ const AdminLogin = () => {
             <Shield className="w-8 h-8 text-primary-foreground" />
           </div>
           <h1 className="text-2xl font-heading font-bold text-primary">Admin Access</h1>
-          <p className="text-muted-foreground font-body mt-2">Sri Ganapathy Silks Management</p>
+          <p className="text-muted-foreground font-body mt-2">Kalai Fashions Management</p>
         </div>
 
         <div className="bg-card border border-border rounded-lg p-8 shadow-luxury">
