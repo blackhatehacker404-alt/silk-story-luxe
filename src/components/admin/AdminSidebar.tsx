@@ -59,10 +59,10 @@ export default function AdminSidebar() {
         {!collapsed ? (
           <div>
             <h2 className="font-heading text-lg text-sidebar-foreground tracking-wide">
-              Sri Ganapathy
-            </h2>
-            <p className="text-xs text-sidebar-foreground/60 font-body">
-              Admin Panel
+            Kalai Fashions
+          </h2>
+          <p className="text-xs text-sidebar-foreground/60 font-body">
+            Admin Panel
             </p>
           </div>
         ) : (
