@@ -32,10 +32,15 @@ const mainNav = [
   { title: "Customers", url: "/admin/customers", icon: Users },
 ];
 
+const mainNav2 = [
+  { title: "Manual Order", url: "/admin/manual-order", icon: ClipboardList },
+];
+
 const settingsNav = [
   { title: "Categories", url: "/admin/categories", icon: FolderOpen },
   { title: "Banners", url: "/admin/banners", icon: Image },
   { title: "Reports", url: "/admin/reports", icon: FileText },
+  { title: "Settings", url: "/admin/settings", icon: Settings },
 ];
 
 export default function AdminSidebar() {
