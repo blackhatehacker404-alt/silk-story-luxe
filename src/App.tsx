@@ -25,6 +25,8 @@ import AdminCustomers from "./pages/admin/AdminCustomers";
 import AdminCategories from "./pages/admin/AdminCategories";
 import AdminBanners from "./pages/admin/AdminBanners";
 import AdminReports from "./pages/admin/AdminReports";
+import AdminSettings from "./pages/admin/AdminSettings";
+import AdminManualOrder from "./pages/admin/AdminManualOrder";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +64,8 @@ function AppContent() {
           <Route path="categories" element={<AdminCategories />} />
           <Route path="banners" element={<AdminBanners />} />
           <Route path="reports" element={<AdminReports />} />
+          <Route path="settings" element={<AdminSettings />} />
+          <Route path="manual-order" element={<AdminManualOrder />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

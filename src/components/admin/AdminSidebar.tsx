@@ -7,6 +7,8 @@ import {
   Image,
   FileText,
   LogOut,
+  Settings,
+  ClipboardList,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -30,10 +32,15 @@ const mainNav = [
   { title: "Customers", url: "/admin/customers", icon: Users },
 ];
 
+const mainNav2 = [
+  { title: "Manual Order", url: "/admin/manual-order", icon: ClipboardList },
+];
+
 const settingsNav = [
   { title: "Categories", url: "/admin/categories", icon: FolderOpen },
   { title: "Banners", url: "/admin/banners", icon: Image },
   { title: "Reports", url: "/admin/reports", icon: FileText },
+  { title: "Settings", url: "/admin/settings", icon: Settings },
 ];
 
 export default function AdminSidebar() {
@@ -52,16 +59,16 @@ export default function AdminSidebar() {
         {!collapsed ? (
           <div>
             <h2 className="font-heading text-lg text-sidebar-foreground tracking-wide">
-              Sri Ganapathy
-            </h2>
-            <p className="text-xs text-sidebar-foreground/60 font-body">
-              Admin Panel
+            Kalai Fashions
+          </h2>
+          <p className="text-xs text-sidebar-foreground/60 font-body">
+            Admin Panel
             </p>
           </div>
         ) : (
           <div className="flex items-center justify-center">
             <span className="text-sidebar-primary font-heading text-xl font-bold">
-              SG
+              KF
             </span>
           </div>
         )}
@@ -84,6 +91,24 @@ export default function AdminSidebar() {
                     <NavLink
                       to={item.url}
                       end={item.url === "/admin"}
+                      className="flex items-center gap-3"
+                      activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+                    >
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.title}</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+              {mainNav2.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive(item.url)}
+                    tooltip={item.title}
+                  >
+                    <NavLink
+                      to={item.url}
                       className="flex items-center gap-3"
                       activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
                     >
