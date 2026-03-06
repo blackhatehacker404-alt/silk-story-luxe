@@ -68,7 +68,7 @@ export default function AdminSidebar() {
         ) : (
           <div className="flex items-center justify-center">
             <span className="text-sidebar-primary font-heading text-xl font-bold">
-              SG
+              KF
             </span>
           </div>
         )}
