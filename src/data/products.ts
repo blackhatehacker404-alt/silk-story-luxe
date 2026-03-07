@@ -23,6 +23,9 @@ export const categories = [
   "Tussar Silk",
   "Organza Silk",
   "Cotton Silk",
+  "Shirt",
+  "Veshti",
+  "Combos",
 ];
 
 export const collections = [

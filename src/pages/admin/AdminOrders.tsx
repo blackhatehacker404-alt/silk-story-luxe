@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Eye, ChevronDown, Download } from "lucide-react";
+import { Search, Eye, ChevronDown, Download, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAdminOrders, useUpdateOrderStatus, OrderRow } from "@/hooks/useOrders";
 import { formatPrice } from "@/data/products";
 import { generateInvoicePDF } from "@/utils/generateInvoice";
+import { generateShippingLabel } from "@/utils/generateShippingLabel";
 import { toast } from "sonner";
 
 const statusColors: Record<string, string> = {
@@ -51,23 +52,35 @@ export default function AdminOrders() {
     });
   };
 
-  const handleDownloadInvoice = (order: OrderRow) => {
-    const addr = order.shipping_address as any;
-    const items = (order.items as any[]).map((i: any) => ({
+  const getOrderItems = (order: OrderRow) => {
+    const items = order.items as any[];
+    return items.map((i: any) => ({
       name: i.name || i.product?.name || "Item",
       quantity: i.quantity || 1,
       price: i.price || i.product?.price || 0,
     }));
+  };
+
+  const handleDownloadInvoice = (order: OrderRow) => {
+    const addr = order.shipping_address as any;
     generateInvoicePDF({
+      orderNumber: order.order_number, date: order.created_at,
+      customerName: addr?.customer_name || addr?.full_name || "Customer",
+      customerPhone: addr?.customer_phone || addr?.phone || "",
+      address: addr, items: getOrderItems(order),
+      totalAmount: order.total_amount, paymentStatus: order.payment_status,
+      paymentMethod: order.payment_method || undefined,
+    });
+  };
+
+  const handleDownloadLabel = (order: OrderRow) => {
+    const addr = order.shipping_address as any;
+    generateShippingLabel({
       orderNumber: order.order_number,
-      date: order.created_at,
       customerName: addr?.customer_name || addr?.full_name || "Customer",
       customerPhone: addr?.customer_phone || addr?.phone || "",
       address: addr,
-      items,
-      totalAmount: order.total_amount,
-      paymentStatus: order.payment_status,
-      paymentMethod: order.payment_method || undefined,
+      items: getOrderItems(order),
     });
   };
 
@@ -80,9 +93,7 @@ export default function AdminOrders() {
     <div className="space-y-6">
       <div>
         <h1 className="font-heading text-2xl font-bold">Orders</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Manage and track all customer orders ({orders.length} total)
-        </p>
+        <p className="text-sm text-muted-foreground mt-1">Manage and track all customer orders ({orders.length} total)</p>
       </div>
 
       <Card className="border-border">
@@ -95,9 +106,7 @@ export default function AdminOrders() {
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full sm:w-40"><SelectValue placeholder="All Statuses" /></SelectTrigger>
               <SelectContent>
-                {allStatuses.map((s) => (
-                  <SelectItem key={s} value={s}>{s === "all" ? "All Statuses" : s.charAt(0).toUpperCase() + s.slice(1)}</SelectItem>
-                ))}
+                {allStatuses.map((s) => (<SelectItem key={s} value={s}>{s === "all" ? "All Statuses" : s.charAt(0).toUpperCase() + s.slice(1)}</SelectItem>))}
               </SelectContent>
             </Select>
           </div>
@@ -150,33 +159,25 @@ export default function AdminOrders() {
                       <Badge variant="secondary" className={`text-[10px] ${paymentColors[order.payment_status] || ""}`}>{order.payment_status}</Badge>
                     </TableCell>
                     <TableCell className="text-right space-x-1">
-                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedOrder(order)}>
-                        <Eye className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDownloadInvoice(order)}>
-                        <Download className="h-3.5 w-3.5" />
-                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedOrder(order)} title="View"><Eye className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDownloadInvoice(order)} title="Invoice"><Download className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDownloadLabel(order)} title="Shipping Label"><Tag className="h-3.5 w-3.5" /></Button>
                     </TableCell>
                   </TableRow>
                 );
               })}
-              {filtered.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No orders found</TableCell>
-                </TableRow>
-              )}
+              {filtered.length === 0 && (<TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No orders found</TableCell></TableRow>)}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
 
-      {/* Order Detail Dialog */}
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
         <DialogContent className="max-w-lg">
           <DialogHeader><DialogTitle className="font-heading">Order {selectedOrder?.order_number}</DialogTitle></DialogHeader>
           {selectedOrder && (() => {
             const addr = selectedOrder.shipping_address as any;
-            const items = selectedOrder.items as any[];
+            const items = getOrderItems(selectedOrder);
             return (
               <div className="space-y-5">
                 <div>
@@ -192,13 +193,13 @@ export default function AdminOrders() {
                 <div>
                   <h4 className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Items</h4>
                   <div className="divide-y divide-border rounded-md border border-border">
-                    {items.map((item: any, i: number) => (
+                    {items.map((item, i) => (
                       <div key={i} className="flex justify-between items-center px-3 py-2">
                         <div>
-                          <p className="text-sm font-medium">{item.name || item.product?.name || "Item"}</p>
-                          <p className="text-xs text-muted-foreground">Qty: {item.quantity || 1}</p>
+                          <p className="text-sm font-medium">{item.name}</p>
+                          <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
                         </div>
-                        <p className="text-sm font-medium">{formatPrice((item.price || item.product?.price || 0) * (item.quantity || 1))}</p>
+                        <p className="text-sm font-medium">{formatPrice(item.price * item.quantity)}</p>
                       </div>
                     ))}
                   </div>
@@ -211,9 +212,14 @@ export default function AdminOrders() {
                   <Badge variant="secondary" className={statusColors[selectedOrder.status] || ""}>{selectedOrder.status}</Badge>
                   <Badge variant="secondary" className={paymentColors[selectedOrder.payment_status] || ""}>{selectedOrder.payment_status}</Badge>
                 </div>
-                <Button variant="outline" className="gap-2" onClick={() => handleDownloadInvoice(selectedOrder)}>
-                  <Download className="h-4 w-4" /> Download Invoice
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" className="gap-2" onClick={() => handleDownloadInvoice(selectedOrder)}>
+                    <Download className="h-4 w-4" /> Invoice
+                  </Button>
+                  <Button variant="outline" className="gap-2" onClick={() => handleDownloadLabel(selectedOrder)}>
+                    <Tag className="h-4 w-4" /> Shipping Label
+                  </Button>
+                </div>
               </div>
             );
           })()}
