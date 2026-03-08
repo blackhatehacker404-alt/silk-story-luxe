@@ -23,7 +23,7 @@ const ProductsPage = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   const filteredProducts = useMemo(() => {
-    let filtered = [...products];
+    let filtered = products.filter((p) => !p.gender || p.gender === "women");
 
     if (selectedCategory) {
       filtered = filtered.filter((p) => p.category === selectedCategory);
