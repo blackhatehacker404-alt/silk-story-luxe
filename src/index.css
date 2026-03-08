@@ -107,6 +107,13 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading;
   }
+
+  /* Mobile-only size reduction */
+  @media (max-width: 767px) {
+    html {
+      font-size: 14px;
+    }
+  }
 }
 
 @layer utilities {
