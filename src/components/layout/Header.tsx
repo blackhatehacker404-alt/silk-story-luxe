@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ShoppingBag, Menu, X, Search, User, Shield } from "lucide-react";
+import { ShoppingBag, Menu, X, Search, User, Shield, Heart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
@@ -72,6 +72,16 @@ const Header = () => {
             {!isAdmin && (
               <Link to="/admin-login" className="p-2 text-muted-foreground hover:text-foreground transition-colors hidden sm:block" aria-label="Admin Login" title="Admin Login">
                 <Shield size={18} />
+              </Link>
+            )}
+
+            {user && (
+              <Link
+                to="/wishlist"
+                className="p-2 text-foreground hover:text-muted-foreground transition-colors hidden sm:block"
+                aria-label="Wishlist"
+              >
+                <Heart size={20} />
               </Link>
             )}
 

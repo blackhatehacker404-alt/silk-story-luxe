@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { User, MapPin, Package, Plus, Trash2, LogOut } from "lucide-react";
 import { formatPrice } from "@/data/products";
+import OrderTimeline from "@/components/products/OrderTimeline";
 
 interface Address {
   id: string;
@@ -192,6 +193,7 @@ const UserDashboard = () => {
                           <span>{new Date(order.created_at).toLocaleDateString("en-IN")}</span>
                           <span className="font-semibold text-foreground">{formatPrice(order.total_amount)}</span>
                         </div>
+                        <OrderTimeline status={order.status} createdAt={order.created_at} />
                       </div>
                     ))}
                   </div>

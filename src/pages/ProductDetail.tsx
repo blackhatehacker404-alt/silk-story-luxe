@@ -5,12 +5,15 @@ import { products, formatPrice } from "@/data/products";
 import { getProductImage } from "@/data/product-images";
 import { useCart } from "@/contexts/CartContext";
 import { useBuyButtonConfig } from "@/hooks/useSiteSettings";
+import { useWishlist } from "@/hooks/useWishlist";
+import ReviewSection from "@/components/products/ReviewSection";
 import { toast } from "sonner";
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { addToCart } = useCart();
   const { data: buyConfig } = useBuyButtonConfig();
+  const { toggleWishlist, isInWishlist } = useWishlist();
 
   const product = products.find((p) => p.id === id);
 
@@ -71,8 +74,12 @@ const ProductDetail = () => {
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="flex flex-col">
             <div className="flex items-start justify-between mb-2">
               <span className="text-xs tracking-[0.3em] uppercase text-accent font-body">{product.collection}</span>
-              <button className="p-2 text-muted-foreground hover:text-accent transition-colors" aria-label="Add to wishlist">
-                <Heart size={20} />
+              <button
+                onClick={() => toggleWishlist(product.id)}
+                className="p-2 text-muted-foreground hover:text-accent transition-colors"
+                aria-label="Add to wishlist"
+              >
+                <Heart size={20} className={isInWishlist(product.id) ? "fill-accent text-accent" : ""} />
               </button>
             </div>
 
@@ -140,6 +147,9 @@ const ProductDetail = () => {
             </div>
           </motion.div>
         </div>
+
+        {/* Reviews Section */}
+        <ReviewSection productId={product.id} />
       </div>
     </main>
   );

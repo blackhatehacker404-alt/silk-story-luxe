@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, Heart } from "lucide-react";
 import { Product, formatPrice } from "@/data/products";
 import { getProductImage } from "@/data/product-images";
 import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/hooks/useWishlist";
 
 interface ProductCardProps {
   product: Product;
@@ -12,6 +13,8 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
   const { addToCart } = useCart();
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const wishlisted = isInWishlist(product.id);
 
   return (
     <motion.div
@@ -43,6 +46,15 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
               </span>
             )}
           </div>
+
+          {/* Wishlist */}
+          <button
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWishlist(product.id); }}
+            className="absolute top-3 right-3 p-2 bg-background/80 backdrop-blur-sm rounded-full transition-all hover:scale-110"
+            aria-label="Toggle wishlist"
+          >
+            <Heart size={16} className={wishlisted ? "fill-accent text-accent" : "text-foreground"} />
+          </button>
 
           {/* Quick add */}
           <motion.button
