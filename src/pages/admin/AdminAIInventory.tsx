@@ -17,7 +17,7 @@ export default function AdminAIInventory() {
       originalPrice: p.originalPrice,
       stock: p.stock ?? Math.floor(Math.random() * 50),
       isNew: p.isNew,
-      isBestseller: p.isBestseller,
+      isBestseller: p.isBestSeller,
     }));
     callAI("inventory-alerts", { products: productData });
   };
