@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
-import { useShopIdentity } from "@/hooks/useSiteSettings";
+import { useShopIdentity, useAboutStats } from "@/hooks/useSiteSettings";
 import { MapPin, Phone, Mail, Instagram, Facebook, Youtube } from "lucide-react";
 
 const About = () => {
   const { data: shop } = useShopIdentity();
+  const { data: stats } = useAboutStats();
 
   return (
     <main className="min-h-screen pt-20">
