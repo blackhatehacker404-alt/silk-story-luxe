@@ -12,6 +12,7 @@ import { useAdminOrders, useUpdateOrderStatus, OrderRow } from "@/hooks/useOrder
 import { formatPrice } from "@/data/products";
 import { generateInvoicePDF } from "@/utils/generateInvoice";
 import { generateShippingLabel } from "@/utils/generateShippingLabel";
+import { useShopIdentity } from "@/hooks/useSiteSettings";
 import { toast } from "sonner";
 
 const statusColors: Record<string, string> = {
@@ -38,6 +39,7 @@ const allStatuses = ["all", "new", "processing", "shipped", "delivered"] as cons
 export default function AdminOrders() {
   const { data: orders = [], isLoading } = useAdminOrders();
   const updateStatus = useUpdateOrderStatus();
+  const { data: shopIdentity } = useShopIdentity();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedOrder, setSelectedOrder] = useState<OrderRow | null>(null);
@@ -102,6 +104,7 @@ export default function AdminOrders() {
       address: addr, items: getOrderItems(order),
       totalAmount: order.total_amount, paymentStatus: order.payment_status,
       paymentMethod: order.payment_method || undefined,
+      shopIdentity,
     });
   };
 
@@ -113,6 +116,7 @@ export default function AdminOrders() {
       customerPhone: addr?.customer_phone || addr?.phone || "",
       address: addr,
       items: getOrderItems(order),
+      shopIdentity,
     });
   };
 
