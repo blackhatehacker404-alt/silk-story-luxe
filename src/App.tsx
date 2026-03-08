@@ -14,6 +14,7 @@ import ProtectedAdminRoute from "@/components/auth/ProtectedAdminRoute";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
+import Menswear from "./pages/Menswear";
 import Auth from "./pages/Auth";
 import AdminLogin from "./pages/AdminLogin";
 import UserDashboard from "./pages/UserDashboard";
