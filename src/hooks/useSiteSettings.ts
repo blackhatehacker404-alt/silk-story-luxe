@@ -7,10 +7,32 @@ export interface BuyButtonConfig {
   whatsapp_number: string;
 }
 
+export interface ShopIdentity {
+  shop_name: string;
+  tagline: string;
+  email: string;
+  phone: string;
+  address_line1: string;
+  city: string;
+  state: string;
+  pincode: string;
+}
+
 const defaultConfig: BuyButtonConfig = {
   online_payment_enabled: true,
   whatsapp_enabled: true,
   whatsapp_number: "+918870226867",
+};
+
+const defaultShopIdentity: ShopIdentity = {
+  shop_name: "Kalai Fashions",
+  tagline: "Elampillai",
+  email: "info@kalaifashions.com",
+  phone: "+91 88702 26867",
+  address_line1: "Elampillai",
+  city: "Salem",
+  state: "Tamil Nadu",
+  pincode: "637502",
 };
 
 export function useBuyButtonConfig() {
