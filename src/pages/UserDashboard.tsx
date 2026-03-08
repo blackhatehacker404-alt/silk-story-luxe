@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { User, MapPin, Package, Plus, Trash2, LogOut } from "lucide-react";
 import { formatPrice } from "@/data/products";
+import OrderTimeline from "@/components/products/OrderTimeline";
 
 interface Address {
   id: string;
