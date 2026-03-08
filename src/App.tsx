@@ -31,6 +31,10 @@ import AdminCoupons from "./pages/admin/AdminCoupons";
 import AdminReports from "./pages/admin/AdminReports";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminManualOrder from "./pages/admin/AdminManualOrder";
+import AdminAIInsights from "./pages/admin/AdminAIInsights";
+import AdminAIDescriptions from "./pages/admin/AdminAIDescriptions";
+import AdminAIChatbot from "./pages/admin/AdminAIChatbot";
+import AdminAIInventory from "./pages/admin/AdminAIInventory";
 
 const queryClient = new QueryClient();
 
