@@ -9,6 +9,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import CartDrawer from "@/components/layout/CartDrawer";
 import AdminLayout from "@/components/admin/AdminLayout";
+import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import ProtectedAdminRoute from "@/components/auth/ProtectedAdminRoute";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
