@@ -1,5 +1,6 @@
 import HeroSlider from "@/components/home/HeroSlider";
 import BrandStory from "@/components/home/BrandStory";
+import FeaturedCollections from "@/components/home/FeaturedCollections";
 import { products } from "@/data/products";
 import ProductCard from "@/components/products/ProductCard";
 import { motion } from "framer-motion";
