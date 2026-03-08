@@ -15,8 +15,9 @@ import {
   useUpdateThemeColors,
   ThemeColors,
 } from "@/hooks/useSiteSettings";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Settings, CreditCard, MessageCircle, Save, Store, MapPin, Mail, Phone, Palette } from "lucide-react";
+import { Settings, CreditCard, MessageCircle, Save, Store, MapPin, Mail, Phone, Palette, Upload, X, Loader2, ImageIcon } from "lucide-react";
 
 const PRESET_PALETTES = [
   { label: "Classic Black", primary: "#141414", accent: "#141414", background: "#ffffff" },
