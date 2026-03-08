@@ -77,6 +77,10 @@ function AppContent() {
           <Route path="reports" element={<AdminReports />} />
           <Route path="settings" element={<AdminSettings />} />
           <Route path="manual-order" element={<AdminManualOrder />} />
+          <Route path="ai-insights" element={<AdminAIInsights />} />
+          <Route path="ai-descriptions" element={<AdminAIDescriptions />} />
+          <Route path="ai-chatbot" element={<AdminAIChatbot />} />
+          <Route path="ai-inventory" element={<AdminAIInventory />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />
