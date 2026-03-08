@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ShoppingBag, Heart } from "lucide-react";
+import { ShoppingBag, Heart, Share2 } from "lucide-react";
+import { toast } from "sonner";
 import { Product, formatPrice } from "@/data/products";
 import { getProductImage } from "@/data/product-images";
 import { useCart } from "@/contexts/CartContext";
@@ -47,14 +48,33 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
             )}
           </div>
 
-          {/* Wishlist */}
-          <button
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWishlist(product.id); }}
-            className="absolute top-3 right-3 p-2 bg-background/80 backdrop-blur-sm rounded-full transition-all hover:scale-110"
-            aria-label="Toggle wishlist"
-          >
-            <Heart size={16} className={wishlisted ? "fill-accent text-accent" : "text-foreground"} />
-          </button>
+          {/* Actions top-right */}
+          <div className="absolute top-3 right-3 flex flex-col gap-1.5">
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWishlist(product.id); }}
+              className="p-2 bg-background/80 backdrop-blur-sm rounded-full transition-all hover:scale-110"
+              aria-label="Toggle wishlist"
+            >
+              <Heart size={16} className={wishlisted ? "fill-accent text-accent" : "text-foreground"} />
+            </button>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const url = `${window.location.origin}/product/${product.id}`;
+                if (navigator.share) {
+                  navigator.share({ title: product.name, url });
+                } else {
+                  navigator.clipboard.writeText(url);
+                  toast.success("Link copied!");
+                }
+              }}
+              className="p-2 bg-background/80 backdrop-blur-sm rounded-full transition-all hover:scale-110"
+              aria-label="Share"
+            >
+              <Share2 size={14} className="text-foreground" />
+            </button>
+          </div>
 
           {/* Quick add */}
           <motion.button
