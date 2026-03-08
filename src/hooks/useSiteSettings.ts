@@ -98,3 +98,47 @@ export function useUpdateShopIdentity() {
     },
   });
 }
+
+export interface ThemeColors {
+  primary: string;
+  accent: string;
+  background: string;
+}
+
+const defaultThemeColors: ThemeColors = {
+  primary: "#141414",
+  accent: "#141414",
+  background: "#ffffff",
+};
+
+export function useThemeColors() {
+  return useQuery({
+    queryKey: ["site-settings", "theme_colors"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "theme_colors")
+        .single();
+      if (error || !data) return defaultThemeColors;
+      return data.value as unknown as ThemeColors;
+    },
+    staleTime: 60000,
+  });
+}
+
+export function useUpdateThemeColors() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (colors: ThemeColors) => {
+      const { error } = await supabase
+        .from("site_settings")
+        .update({ value: colors as any, updated_at: new Date().toISOString() })
+        .eq("key", "theme_colors");
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["site-settings", "theme_colors"] });
+    },
+  });
+}
