@@ -5,6 +5,8 @@ import { products, formatPrice } from "@/data/products";
 import { getProductImage } from "@/data/product-images";
 import { useCart } from "@/contexts/CartContext";
 import { useBuyButtonConfig } from "@/hooks/useSiteSettings";
+import { useWishlist } from "@/hooks/useWishlist";
+import ReviewSection from "@/components/products/ReviewSection";
 import { toast } from "sonner";
 
 const ProductDetail = () => {
