@@ -75,6 +75,16 @@ const Header = () => {
               </Link>
             )}
 
+            {user && (
+              <Link
+                to="/wishlist"
+                className="p-2 text-foreground hover:text-muted-foreground transition-colors hidden sm:block"
+                aria-label="Wishlist"
+              >
+                <Heart size={20} />
+              </Link>
+            )}
+
             <Link
               to={user ? "/account" : "/auth"}
               className="p-2 text-foreground hover:text-muted-foreground transition-colors hidden sm:block"

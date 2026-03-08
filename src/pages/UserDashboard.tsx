@@ -193,6 +193,7 @@ const UserDashboard = () => {
                           <span>{new Date(order.created_at).toLocaleDateString("en-IN")}</span>
                           <span className="font-semibold text-foreground">{formatPrice(order.total_amount)}</span>
                         </div>
+                        <OrderTimeline status={order.status} createdAt={order.created_at} />
                       </div>
                     ))}
                   </div>
