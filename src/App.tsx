@@ -25,6 +25,7 @@ import AdminOrders from "./pages/admin/AdminOrders";
 import AdminCustomers from "./pages/admin/AdminCustomers";
 import AdminCategories from "./pages/admin/AdminCategories";
 import AdminBanners from "./pages/admin/AdminBanners";
+import AdminCoupons from "./pages/admin/AdminCoupons";
 import AdminReports from "./pages/admin/AdminReports";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminManualOrder from "./pages/admin/AdminManualOrder";
@@ -65,6 +66,7 @@ function AppContent() {
           <Route path="customers" element={<AdminCustomers />} />
           <Route path="categories" element={<AdminCategories />} />
           <Route path="banners" element={<AdminBanners />} />
+          <Route path="coupons" element={<AdminCoupons />} />
           <Route path="reports" element={<AdminReports />} />
           <Route path="settings" element={<AdminSettings />} />
           <Route path="manual-order" element={<AdminManualOrder />} />

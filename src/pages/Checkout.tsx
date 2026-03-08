@@ -9,26 +9,47 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { ChevronLeft, ShoppingBag } from "lucide-react";
+import { ChevronLeft, ShoppingBag, Ticket, X } from "lucide-react";
+import { useValidateCoupon, useIncrementCouponUsage } from "@/hooks/useCoupons";
 
 export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const validateCoupon = useValidateCoupon();
+  const incrementUsage = useIncrementCouponUsage();
+
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ id: string; code: string; discount: number } | null>(null);
 
   const [form, setForm] = useState({
-    fullName: "",
-    phone: "",
-    addressLine1: "",
-    addressLine2: "",
-    city: "",
-    state: "Tamil Nadu",
-    pincode: "",
+    fullName: "", phone: "", addressLine1: "", addressLine2: "",
+    city: "", state: "Tamil Nadu", pincode: "",
   });
 
-  const update = (field: string, value: string) =>
-    setForm((p) => ({ ...p, [field]: value }));
+  const update = (field: string, value: string) => setForm((p) => ({ ...p, [field]: value }));
+
+  const finalTotal = totalPrice - (appliedCoupon?.discount || 0);
+
+  const handleApplyCoupon = () => {
+    if (!couponCode.trim()) return;
+    validateCoupon.mutate(
+      { code: couponCode, orderTotal: totalPrice },
+      {
+        onSuccess: (result) => {
+          setAppliedCoupon({ id: result.coupon.id, code: result.coupon.code, discount: result.discount });
+          toast.success(`Coupon applied! You save ${formatPrice(result.discount)}`);
+        },
+        onError: (e) => toast.error(e.message),
+      }
+    );
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode("");
+  };
 
   if (items.length === 0) {
     return (
@@ -64,38 +85,34 @@ export default function Checkout() {
     try {
       const orderNumber = `KF-${Date.now().toString(36).toUpperCase()}`;
       const orderItems = items.map((item) => ({
-        name: item.product.name,
-        product_id: item.product.id,
-        quantity: item.quantity,
-        price: item.product.price,
+        name: item.product.name, product_id: item.product.id,
+        quantity: item.quantity, price: item.product.price,
       }));
 
       const { error } = await supabase.from("orders").insert({
-        user_id: user.id,
-        order_number: orderNumber,
-        items: orderItems as any,
-        total_amount: totalPrice,
+        user_id: user.id, order_number: orderNumber,
+        items: orderItems as any, total_amount: finalTotal,
         shipping_address: {
-          full_name: form.fullName,
-          phone: form.phone,
-          address_line1: form.addressLine1,
-          address_line2: form.addressLine2,
-          city: form.city,
-          state: form.state,
-          pincode: form.pincode,
+          full_name: form.fullName, phone: form.phone,
+          address_line1: form.addressLine1, address_line2: form.addressLine2,
+          city: form.city, state: form.state, pincode: form.pincode,
         } as any,
-        payment_method: "cod",
-        payment_status: "pending",
-        status: "new",
+        payment_method: "cod", payment_status: "pending", status: "new",
       });
 
       if (error) throw error;
 
+      // Increment coupon usage
+      if (appliedCoupon) {
+        incrementUsage.mutate(appliedCoupon.id);
+      }
+
       // WhatsApp notification to admin
       const number = "918870226867";
       const itemsText = items.map((i) => `${i.product.name} × ${i.quantity}`).join("\n");
+      const discountText = appliedCoupon ? `\nDiscount: -${formatPrice(appliedCoupon.discount)} (${appliedCoupon.code})` : "";
       const text = encodeURIComponent(
-        `🛒 New Order!\n\nOrder: ${orderNumber}\nCustomer: ${form.fullName}\nPhone: ${form.phone}\n\nItems:\n${itemsText}\n\nTotal: ${formatPrice(totalPrice)}\n\nAddress: ${form.addressLine1}, ${form.city}, ${form.state} - ${form.pincode}`
+        `🛒 New Order!\n\nOrder: ${orderNumber}\nCustomer: ${form.fullName}\nPhone: ${form.phone}\n\nItems:\n${itemsText}${discountText}\n\nTotal: ${formatPrice(finalTotal)}\n\nAddress: ${form.addressLine1}, ${form.city}, ${form.state} - ${form.pincode}`
       );
       window.open(`https://wa.me/${number}?text=${text}`, "_blank");
 
@@ -167,16 +184,40 @@ export default function Checkout() {
                     <span className="font-medium">{formatPrice(item.product.price * item.quantity)}</span>
                   </div>
                 ))}
+
+                {/* Coupon */}
+                <div className="pt-3 border-t border-border">
+                  {appliedCoupon ? (
+                    <div className="flex items-center justify-between bg-primary/5 rounded-md px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <Ticket className="h-4 w-4 text-primary" />
+                        <span className="text-sm font-medium">{appliedCoupon.code}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-primary font-medium">-{formatPrice(appliedCoupon.discount)}</span>
+                        <button onClick={removeCoupon} className="text-muted-foreground hover:text-destructive"><X className="h-4 w-4" /></button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Input
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                        placeholder="Coupon code"
+                        className="text-sm"
+                      />
+                      <Button variant="outline" size="sm" onClick={handleApplyCoupon} disabled={validateCoupon.isPending}>
+                        Apply
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
                 <div className="pt-3 border-t border-border flex justify-between">
                   <span className="font-body text-muted-foreground">Total</span>
-                  <span className="text-lg font-heading font-bold">{formatPrice(totalPrice)}</span>
+                  <span className="text-lg font-heading font-bold">{formatPrice(finalTotal)}</span>
                 </div>
-                <Button
-                  onClick={handlePlaceOrder}
-                  disabled={loading}
-                  className="w-full"
-                  size="lg"
-                >
+                <Button onClick={handlePlaceOrder} disabled={loading} className="w-full" size="lg">
                   {loading ? "Placing Order..." : "Place Order & Notify via WhatsApp"}
                 </Button>
                 <p className="text-xs text-muted-foreground text-center font-body">

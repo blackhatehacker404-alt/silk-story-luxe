@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, Edit, Trash2, Eye, EyeOff, Package } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Eye, EyeOff, Package, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -12,9 +12,11 @@ import { products as initialProducts, categories, collections, formatPrice, Prod
 import { useToast } from "@/hooks/use-toast";
 import ImageUpload from "@/components/admin/ImageUpload";
 
+const LOW_STOCK_THRESHOLD = 5;
+
 export default function AdminProducts() {
   const [productList, setProductList] = useState<(Product & { visible?: boolean })[]>(
-    initialProducts.map((p) => ({ ...p, visible: true }))
+    initialProducts.map((p) => ({ ...p, visible: true, stock: p.stock ?? 10 }))
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -25,8 +27,10 @@ export default function AdminProducts() {
   const [formData, setFormData] = useState({
     name: "", tamilName: "", price: "", originalPrice: "",
     category: "", collection: "", description: "", fabric: "",
-    borderDescription: "", palluDescription: "",
+    borderDescription: "", palluDescription: "", stock: "10",
   });
+
+  const lowStockCount = productList.filter((p) => (p.stock ?? 0) <= LOW_STOCK_THRESHOLD).length;
 
   const filtered = productList.filter(
     (p) =>
@@ -36,7 +40,7 @@ export default function AdminProducts() {
   );
 
   const resetForm = () => {
-    setFormData({ name: "", tamilName: "", price: "", originalPrice: "", category: "", collection: "", description: "", fabric: "", borderDescription: "", palluDescription: "" });
+    setFormData({ name: "", tamilName: "", price: "", originalPrice: "", category: "", collection: "", description: "", fabric: "", borderDescription: "", palluDescription: "", stock: "10" });
     setEditingProduct(null);
     setUploadedImages([]);
   };
@@ -50,6 +54,7 @@ export default function AdminProducts() {
       originalPrice: product.originalPrice?.toString() || "", category: product.category,
       collection: product.collection, description: product.description, fabric: product.fabric,
       borderDescription: product.borderDescription, palluDescription: product.palluDescription,
+      stock: (product.stock ?? 10).toString(),
     });
     setUploadedImages(product.images || []);
     setIsDialogOpen(true);
@@ -68,7 +73,7 @@ export default function AdminProducts() {
           price: Number(formData.price), originalPrice: formData.originalPrice ? Number(formData.originalPrice) : undefined,
           category: formData.category, collection: formData.collection, description: formData.description,
           fabric: formData.fabric, borderDescription: formData.borderDescription, palluDescription: formData.palluDescription,
-          images: uploadedImages,
+          images: uploadedImages, stock: Number(formData.stock),
         } : p
       ));
       toast({ title: "Product updated successfully" });
@@ -78,7 +83,7 @@ export default function AdminProducts() {
         price: Number(formData.price), originalPrice: formData.originalPrice ? Number(formData.originalPrice) : undefined,
         category: formData.category, collection: formData.collection, description: formData.description,
         fabric: formData.fabric, borderDescription: formData.borderDescription, palluDescription: formData.palluDescription,
-        images: uploadedImages, visible: true,
+        images: uploadedImages, visible: true, stock: Number(formData.stock),
       };
       setProductList((prev) => [newProduct, ...prev]);
       toast({ title: "Product added successfully" });
@@ -103,83 +108,93 @@ export default function AdminProducts() {
           <h1 className="font-heading text-2xl font-bold">Products</h1>
           <p className="text-sm text-muted-foreground mt-1">Manage your collection ({productList.length} products)</p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={openAddDialog} className="gap-2"><Plus className="h-4 w-4" />Add Product</Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="font-heading">{editingProduct ? "Edit Product" : "Add New Product"}</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Product Name *</Label>
-                  <Input value={formData.name} onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))} placeholder="Royal Burgundy Bridal Silk" />
+        <div className="flex items-center gap-3">
+          {lowStockCount > 0 && (
+            <Badge variant="destructive" className="gap-1">
+              <AlertTriangle className="h-3 w-3" /> {lowStockCount} low stock
+            </Badge>
+          )}
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={openAddDialog} className="gap-2"><Plus className="h-4 w-4" />Add Product</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="font-heading">{editingProduct ? "Edit Product" : "Add New Product"}</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Product Name *</Label>
+                    <Input value={formData.name} onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))} placeholder="Royal Burgundy Bridal Silk" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Tamil Name</Label>
+                    <Input value={formData.tamilName} onChange={(e) => setFormData((p) => ({ ...p, tamilName: e.target.value }))} />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Tamil Name</Label>
-                  <Input value={formData.tamilName} onChange={(e) => setFormData((p) => ({ ...p, tamilName: e.target.value }))} />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>Price (₹) *</Label>
+                    <Input type="number" value={formData.price} onChange={(e) => setFormData((p) => ({ ...p, price: e.target.value }))} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Original Price (₹)</Label>
+                    <Input type="number" value={formData.originalPrice} onChange={(e) => setFormData((p) => ({ ...p, originalPrice: e.target.value }))} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Stock Quantity</Label>
+                    <Input type="number" value={formData.stock} onChange={(e) => setFormData((p) => ({ ...p, stock: e.target.value }))} placeholder="10" />
+                  </div>
                 </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Price (₹) *</Label>
-                  <Input type="number" value={formData.price} onChange={(e) => setFormData((p) => ({ ...p, price: e.target.value }))} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Category *</Label>
+                    <Select value={formData.category} onValueChange={(val) => setFormData((p) => ({ ...p, category: val }))}>
+                      <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+                      <SelectContent>{categories.map((cat) => (<SelectItem key={cat} value={cat}>{cat}</SelectItem>))}</SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Collection</Label>
+                    <Select value={formData.collection} onValueChange={(val) => setFormData((p) => ({ ...p, collection: val }))}>
+                      <SelectTrigger><SelectValue placeholder="Select collection" /></SelectTrigger>
+                      <SelectContent>{collections.map((col) => (<SelectItem key={col} value={col}>{col}</SelectItem>))}</SelectContent>
+                    </Select>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Original Price (₹)</Label>
-                  <Input type="number" value={formData.originalPrice} onChange={(e) => setFormData((p) => ({ ...p, originalPrice: e.target.value }))} />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Category *</Label>
-                  <Select value={formData.category} onValueChange={(val) => setFormData((p) => ({ ...p, category: val }))}>
-                    <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
-                    <SelectContent>{categories.map((cat) => (<SelectItem key={cat} value={cat}>{cat}</SelectItem>))}</SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Collection</Label>
-                  <Select value={formData.collection} onValueChange={(val) => setFormData((p) => ({ ...p, collection: val }))}>
-                    <SelectTrigger><SelectValue placeholder="Select collection" /></SelectTrigger>
-                    <SelectContent>{collections.map((col) => (<SelectItem key={col} value={col}>{col}</SelectItem>))}</SelectContent>
-                  </Select>
-                </div>
-              </div>
 
-              {/* Image Upload */}
-              <div className="space-y-2">
-                <Label>Product Images</Label>
-                <ImageUpload images={uploadedImages} onImagesChange={setUploadedImages} folder="products" />
-              </div>
+                <div className="space-y-2">
+                  <Label>Product Images</Label>
+                  <ImageUpload images={uploadedImages} onImagesChange={setUploadedImages} folder="products" />
+                </div>
 
-              <div className="space-y-2">
-                <Label>Description</Label>
-                <textarea className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-h-[80px]" value={formData.description} onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))} />
-              </div>
-              <div className="space-y-2">
-                <Label>Fabric</Label>
-                <Input value={formData.fabric} onChange={(e) => setFormData((p) => ({ ...p, fabric: e.target.value }))} />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Border Description</Label>
-                  <Input value={formData.borderDescription} onChange={(e) => setFormData((p) => ({ ...p, borderDescription: e.target.value }))} />
+                  <Label>Description</Label>
+                  <textarea className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-h-[80px]" value={formData.description} onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Pallu Description</Label>
-                  <Input value={formData.palluDescription} onChange={(e) => setFormData((p) => ({ ...p, palluDescription: e.target.value }))} />
+                  <Label>Fabric</Label>
+                  <Input value={formData.fabric} onChange={(e) => setFormData((p) => ({ ...p, fabric: e.target.value }))} />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Border Description</Label>
+                    <Input value={formData.borderDescription} onChange={(e) => setFormData((p) => ({ ...p, borderDescription: e.target.value }))} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Pallu Description</Label>
+                    <Input value={formData.palluDescription} onChange={(e) => setFormData((p) => ({ ...p, palluDescription: e.target.value }))} />
+                  </div>
+                </div>
+                <div className="flex justify-end gap-3 pt-2">
+                  <Button variant="outline" onClick={() => { setIsDialogOpen(false); resetForm(); }}>Cancel</Button>
+                  <Button onClick={handleSave}>{editingProduct ? "Update Product" : "Add Product"}</Button>
                 </div>
               </div>
-              <div className="flex justify-end gap-3 pt-2">
-                <Button variant="outline" onClick={() => { setIsDialogOpen(false); resetForm(); }}>Cancel</Button>
-                <Button onClick={handleSave}>{editingProduct ? "Update Product" : "Add Product"}</Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <Card className="border-border">
@@ -199,8 +214,8 @@ export default function AdminProducts() {
                 <TableHead className="w-12"></TableHead>
                 <TableHead>Product</TableHead>
                 <TableHead className="hidden md:table-cell">Category</TableHead>
-                <TableHead className="hidden lg:table-cell">Collection</TableHead>
                 <TableHead>Price</TableHead>
+                <TableHead>Stock</TableHead>
                 <TableHead className="hidden sm:table-cell">Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -224,12 +239,16 @@ export default function AdminProducts() {
                     </div>
                   </TableCell>
                   <TableCell className="hidden md:table-cell text-sm">{product.category}</TableCell>
-                  <TableCell className="hidden lg:table-cell text-sm">{product.collection}</TableCell>
                   <TableCell>
                     <div>
                       <span className="text-sm font-medium">{formatPrice(product.price)}</span>
                       {product.originalPrice && (<span className="text-xs text-muted-foreground line-through ml-2">{formatPrice(product.originalPrice)}</span>)}
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={(product.stock ?? 0) <= LOW_STOCK_THRESHOLD ? "destructive" : "secondary"} className="text-[10px]">
+                      {(product.stock ?? 0) <= 0 ? "Out of Stock" : (product.stock ?? 0) <= LOW_STOCK_THRESHOLD ? `Low: ${product.stock}` : product.stock}
+                    </Badge>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">
                     <Badge variant={product.visible !== false ? "default" : "secondary"} className="text-[10px]">{product.visible !== false ? "Visible" : "Hidden"}</Badge>

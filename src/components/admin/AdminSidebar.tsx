@@ -9,6 +9,7 @@ import {
   LogOut,
   Settings,
   ClipboardList,
+  Ticket,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -39,6 +40,7 @@ const mainNav2 = [
 const settingsNav = [
   { title: "Categories", url: "/admin/categories", icon: FolderOpen },
   { title: "Banners", url: "/admin/banners", icon: Image },
+  { title: "Coupons", url: "/admin/coupons", icon: Ticket },
   { title: "Reports", url: "/admin/reports", icon: FileText },
   { title: "Settings", url: "/admin/settings", icon: Settings },
 ];
