@@ -53,6 +53,7 @@ const Index = () => {
         </div>
       </section>
 
+      <FeaturedCollections />
       <BrandStory />
     </main>
   );

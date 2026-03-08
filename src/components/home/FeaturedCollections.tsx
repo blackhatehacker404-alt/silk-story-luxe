@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Share2 } from "lucide-react";
+import { toast } from "sonner";
 import collectionBridal from "@/assets/collection-bridal.jpg";
 import collectionFestival from "@/assets/collection-festival.jpg";
 import collectionContemporary from "@/assets/collection-contemporary.jpg";
@@ -32,6 +33,18 @@ const collections = [
     link: "/menswear",
   },
 ];
+
+const handleShare = (e: React.MouseEvent, title: string, link: string) => {
+  e.preventDefault();
+  e.stopPropagation();
+  const url = `${window.location.origin}${link}`;
+  if (navigator.share) {
+    navigator.share({ title, url });
+  } else {
+    navigator.clipboard.writeText(url);
+    toast.success("Link copied!");
+  }
+};
 
 const FeaturedCollections = () => {
   return (
@@ -71,15 +84,25 @@ const FeaturedCollections = () => {
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
                 />
+
+                {/* Share button */}
+                <button
+                  onClick={(e) => handleShare(e, col.title, col.link)}
+                  className="absolute top-3 right-3 p-2 bg-background/80 backdrop-blur-sm rounded-full transition-all hover:scale-110 z-10"
+                  aria-label={`Share ${col.title}`}
+                >
+                  <Share2 size={14} className="text-foreground" />
+                </button>
+
                 <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-transparent to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6 lg:p-8">
-                  <p className="text-xs tracking-[0.3em] uppercase text-gold-light mb-2 font-body">
+                  <p className="text-xs tracking-[0.3em] uppercase text-accent mb-2 font-body">
                     {col.subtitle}
                   </p>
-                  <h3 className="text-xl lg:text-2xl font-heading font-bold text-cream mb-3">
+                  <h3 className="text-xl lg:text-2xl font-heading font-bold text-background mb-3">
                     {col.title}
                   </h3>
-                  <span className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-cream/80 group-hover:text-gold transition-colors font-body">
+                  <span className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-background/80 group-hover:text-accent transition-colors font-body">
                     Explore <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
                   </span>
                 </div>
