@@ -28,6 +28,42 @@ const PRESET_PALETTES = [
   { label: "Plum Purple", primary: "#3d1f4e", accent: "#5a2d7a", background: "#faf5fc" },
 ];
 
+function LogoUploader({ onUploaded }: { onUploaded: (url: string) => void }) {
+  const [uploading, setUploading] = useState(false);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const path = `logo/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("brand-assets").upload(path, file, { upsert: true });
+    if (error) {
+      toast.error("Upload failed");
+      setUploading(false);
+      return;
+    }
+    const { data } = supabase.storage.from("brand-assets").getPublicUrl(path);
+    onUploaded(data.publicUrl);
+    setUploading(false);
+    e.target.value = "";
+  };
+
+  return (
+    <label className="h-16 w-32 rounded border-2 border-dashed border-border flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors">
+      {uploading ? (
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      ) : (
+        <>
+          <Upload className="h-4 w-4 text-muted-foreground" />
+          <span className="text-[10px] text-muted-foreground mt-1">Upload Logo</span>
+        </>
+      )}
+      <input type="file" accept="image/*" onChange={handleUpload} className="hidden" disabled={uploading} />
+    </label>
+  );
+}
+
 export default function AdminSettings() {
   const { data: config, isLoading: loadingBuy } = useBuyButtonConfig();
   const updateConfig = useUpdateBuyButtonConfig();
