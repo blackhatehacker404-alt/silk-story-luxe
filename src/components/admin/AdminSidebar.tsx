@@ -10,6 +10,10 @@ import {
   Settings,
   ClipboardList,
   Ticket,
+  Sparkles,
+  Wand2,
+  Bot,
+  PackageSearch,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -35,6 +39,13 @@ const mainNav = [
 
 const mainNav2 = [
   { title: "Manual Order", url: "/admin/manual-order", icon: ClipboardList },
+];
+
+const aiNav = [
+  { title: "Sales Insights", url: "/admin/ai-insights", icon: Sparkles },
+  { title: "Description Gen", url: "/admin/ai-descriptions", icon: Wand2 },
+  { title: "AI Assistant", url: "/admin/ai-chatbot", icon: Bot },
+  { title: "Smart Inventory", url: "/admin/ai-inventory", icon: PackageSearch },
 ];
 
 const settingsNav = [
