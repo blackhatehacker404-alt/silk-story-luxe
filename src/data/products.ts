@@ -14,6 +14,7 @@ export interface Product {
   isNew?: boolean;
   isBestSeller?: boolean;
   isFeatured?: boolean;
+  stock?: number;
 }
 
 export const categories = [

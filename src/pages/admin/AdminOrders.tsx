@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Eye, ChevronDown, Download, Tag } from "lucide-react";
+import { Search, Eye, ChevronDown, Download, Tag, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +27,12 @@ const paymentColors: Record<string, string> = {
   failed: "bg-red-100 text-red-800",
 };
 
+const statusMessages: Record<string, string> = {
+  processing: "Your order is being processed and will be shipped soon.",
+  shipped: "Your order has been shipped! You'll receive it soon.",
+  delivered: "Your order has been delivered. Thank you for shopping with Kalai Fashions!",
+};
+
 const allStatuses = ["all", "new", "processing", "shipped", "delivered"] as const;
 
 export default function AdminOrders() {
@@ -46,9 +52,35 @@ export default function AdminOrders() {
     return matchesSearch && matchesStatus;
   });
 
+  const sendWhatsAppNotification = (order: OrderRow, newStatus: string) => {
+    const addr = order.shipping_address as any;
+    const phone = (addr?.customer_phone || addr?.phone || "").replace(/[^0-9]/g, "");
+    if (!phone) return;
+
+    const customerName = addr?.customer_name || addr?.full_name || "Customer";
+    const msg = statusMessages[newStatus];
+    if (!msg) return;
+
+    const text = encodeURIComponent(
+      `Hi ${customerName}! 🙏\n\n` +
+      `Order Update: *${order.order_number}*\n` +
+      `Status: *${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}*\n\n` +
+      `${msg}\n\n` +
+      `— Kalai Fashions`
+    );
+    const phoneNum = phone.startsWith("91") ? phone : `91${phone}`;
+    window.open(`https://wa.me/${phoneNum}?text=${text}`, "_blank");
+  };
+
   const handleStatusUpdate = (orderId: string, newStatus: string) => {
+    const order = orders.find((o) => o.id === orderId);
     updateStatus.mutate({ id: orderId, status: newStatus }, {
-      onSuccess: () => toast.success(`Order status updated to ${newStatus}`),
+      onSuccess: () => {
+        toast.success(`Order status updated to ${newStatus}`);
+        if (order && statusMessages[newStatus]) {
+          sendWhatsAppNotification(order, newStatus);
+        }
+      },
     });
   };
 
@@ -150,7 +182,10 @@ export default function AdminOrders() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="start">
                           {(["new", "processing", "shipped", "delivered"] as const).map((status) => (
-                            <DropdownMenuItem key={status} onClick={() => handleStatusUpdate(order.id, status)} className="capitalize">{status}</DropdownMenuItem>
+                            <DropdownMenuItem key={status} onClick={() => handleStatusUpdate(order.id, status)} className="capitalize">
+                              {status}
+                              {statusMessages[status] && <MessageCircle className="ml-auto h-3 w-3 text-muted-foreground" />}
+                            </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
                       </DropdownMenu>

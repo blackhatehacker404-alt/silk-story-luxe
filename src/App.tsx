@@ -66,6 +66,7 @@ function AppContent() {
           <Route path="customers" element={<AdminCustomers />} />
           <Route path="categories" element={<AdminCategories />} />
           <Route path="banners" element={<AdminBanners />} />
+          <Route path="coupons" element={<AdminCoupons />} />
           <Route path="reports" element={<AdminReports />} />
           <Route path="settings" element={<AdminSettings />} />
           <Route path="manual-order" element={<AdminManualOrder />} />
