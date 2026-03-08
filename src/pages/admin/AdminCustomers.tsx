@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Eye, Phone, Mail, Plus, Edit2, Trash2, UserPlus } from "lucide-react";
+import { Search, Eye, Phone, Plus, Edit2, Trash2, UserPlus, Download, X, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,10 +33,23 @@ interface Customer {
   state: string | null;
   pincode: string | null;
   notes: string | null;
+  tags: string[] | null;
   source: string;
   created_at: string;
   updated_at: string;
 }
+
+const PRESET_TAGS = ["VIP", "Wholesale", "Retail", "Regular", "New", "Bridal", "Corporate"];
+
+const TAG_COLORS: Record<string, string> = {
+  VIP: "bg-amber-100 text-amber-800 border-amber-200",
+  Wholesale: "bg-blue-100 text-blue-800 border-blue-200",
+  Retail: "bg-green-100 text-green-800 border-green-200",
+  Regular: "bg-muted text-muted-foreground border-border",
+  New: "bg-purple-100 text-purple-800 border-purple-200",
+  Bridal: "bg-pink-100 text-pink-800 border-pink-200",
+  Corporate: "bg-slate-100 text-slate-800 border-slate-200",
+};
 
 const emptyCustomer = {
   full_name: "",
@@ -47,6 +60,7 @@ const emptyCustomer = {
   state: "",
   pincode: "",
   notes: "",
+  tags: [] as string[],
 };
 
 export default function AdminCustomers() {
@@ -55,6 +69,7 @@ export default function AdminCustomers() {
   const [showForm, setShowForm] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [form, setForm] = useState(emptyCustomer);
+  const [customTag, setCustomTag] = useState("");
   const queryClient = useQueryClient();
 
   const { data: profiles = [] } = useQuery({
@@ -111,6 +126,7 @@ export default function AdminCustomers() {
     setShowForm(false);
     setEditingCustomer(null);
     setForm(emptyCustomer);
+    setCustomTag("");
   };
 
   const openEdit = (c: Customer) => {
@@ -124,6 +140,7 @@ export default function AdminCustomers() {
       state: c.state || "",
       pincode: c.pincode || "",
       notes: c.notes || "",
+      tags: c.tags || [],
     });
     setShowForm(true);
   };
@@ -136,6 +153,78 @@ export default function AdminCustomers() {
     upsertCustomer.mutate(editingCustomer ? { ...form, id: editingCustomer.id } : form);
   };
 
+  const toggleTag = (tag: string) => {
+    setForm((f) => ({
+      ...f,
+      tags: f.tags.includes(tag) ? f.tags.filter((t) => t !== tag) : [...f.tags, tag],
+    }));
+  };
+
+  const addCustomTag = () => {
+    const tag = customTag.trim();
+    if (tag && !form.tags.includes(tag)) {
+      setForm((f) => ({ ...f, tags: [...f.tags, tag] }));
+      setCustomTag("");
+    }
+  };
+
+  const exportCSV = () => {
+    const allCustomers = [
+      ...profiles.map((p) => ({
+        Name: p.full_name || "Unknown",
+        Email: "",
+        Phone: p.phone || "",
+        Address: "",
+        City: "",
+        State: "",
+        Pincode: "",
+        Tags: "",
+        Notes: "",
+        Source: "Registered",
+        Orders: getCustomerOrders(p.user_id).length,
+        "Total Spent": getCustomerSpent(p.user_id),
+        "Joined": formatDate(p.created_at),
+      })),
+      ...customers.map((c) => ({
+        Name: c.full_name,
+        Email: c.email || "",
+        Phone: c.phone || "",
+        Address: c.address || "",
+        City: c.city || "",
+        State: c.state || "",
+        Pincode: c.pincode || "",
+        Tags: (c.tags || []).join("; "),
+        Notes: c.notes || "",
+        Source: "Manual",
+        Orders: "",
+        "Total Spent": "",
+        "Joined": formatDate(c.created_at),
+      })),
+    ];
+
+    if (allCustomers.length === 0) {
+      toast.error("No customers to export");
+      return;
+    }
+
+    const headers = Object.keys(allCustomers[0]);
+    const csvRows = [
+      headers.join(","),
+      ...allCustomers.map((row) =>
+        headers.map((h) => `"${String((row as any)[h]).replace(/"/g, '""')}"`).join(",")
+      ),
+    ];
+
+    const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `customers-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("CSV exported successfully");
+  };
+
   const filteredProfiles = profiles.filter((p) => {
     const q = searchQuery.toLowerCase();
     return (p.full_name || "").toLowerCase().includes(q) || (p.phone || "").includes(q);
@@ -146,7 +235,8 @@ export default function AdminCustomers() {
     return (
       c.full_name.toLowerCase().includes(q) ||
       (c.email || "").toLowerCase().includes(q) ||
-      (c.phone || "").includes(q)
+      (c.phone || "").includes(q) ||
+      (c.tags || []).some((t) => t.toLowerCase().includes(q))
     );
   });
 
@@ -157,28 +247,35 @@ export default function AdminCustomers() {
   const formatDate = (d: string) =>
     new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 
+  const getTagClass = (tag: string) => TAG_COLORS[tag] || "bg-secondary text-secondary-foreground border-border";
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="font-heading text-2xl font-bold">Customers</h1>
           <p className="text-sm text-muted-foreground mt-1">
             {profiles.length} registered · {customers.length} manual
           </p>
         </div>
-        <Button
-          onClick={() => { setEditingCustomer(null); setForm(emptyCustomer); setShowForm(true); }}
-          className="gap-2"
-        >
-          <UserPlus className="h-4 w-4" /> Add Customer
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={exportCSV} className="gap-2">
+            <Download className="h-4 w-4" /> Export CSV
+          </Button>
+          <Button
+            onClick={() => { setEditingCustomer(null); setForm(emptyCustomer); setShowForm(true); }}
+            className="gap-2"
+          >
+            <UserPlus className="h-4 w-4" /> Add Customer
+          </Button>
+        </div>
       </div>
 
       <Card className="border-border">
         <CardContent className="p-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search by name, email or phone..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
+            <Input placeholder="Search by name, email, phone or tag..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
           </div>
         </CardContent>
       </Card>
@@ -254,7 +351,7 @@ export default function AdminCustomers() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Customer</TableHead>
-                    <TableHead className="hidden md:table-cell">Email</TableHead>
+                    <TableHead className="hidden md:table-cell">Tags</TableHead>
                     <TableHead className="hidden md:table-cell">Phone</TableHead>
                     <TableHead className="hidden lg:table-cell">City</TableHead>
                     <TableHead className="hidden lg:table-cell">Added</TableHead>
@@ -273,11 +370,20 @@ export default function AdminCustomers() {
                           </div>
                           <div>
                             <p className="text-sm font-medium">{c.full_name}</p>
-                            {c.notes && <p className="text-xs text-muted-foreground truncate max-w-[120px]">{c.notes}</p>}
+                            {c.email && <p className="text-xs text-muted-foreground">{c.email}</p>}
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="hidden md:table-cell text-sm">{c.email || "—"}</TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <div className="flex flex-wrap gap-1">
+                          {(c.tags || []).map((tag) => (
+                            <span key={tag} className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${getTagClass(tag)}`}>
+                              {tag}
+                            </span>
+                          ))}
+                          {(!c.tags || c.tags.length === 0) && <span className="text-xs text-muted-foreground">—</span>}
+                        </div>
+                      </TableCell>
                       <TableCell className="hidden md:table-cell text-sm">{c.phone || "—"}</TableCell>
                       <TableCell className="hidden lg:table-cell text-sm">{c.city || "—"}</TableCell>
                       <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">{formatDate(c.created_at)}</TableCell>
@@ -407,6 +513,49 @@ export default function AdminCustomers() {
                 <Input value={form.pincode} onChange={(e) => setForm((f) => ({ ...f, pincode: e.target.value }))} />
               </div>
             </div>
+
+            {/* Tags Section */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-1.5"><Tag className="h-3.5 w-3.5" /> Tags</Label>
+              <div className="flex flex-wrap gap-1.5">
+                {PRESET_TAGS.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => toggleTag(tag)}
+                    className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium transition-all cursor-pointer ${
+                      form.tags.includes(tag)
+                        ? getTagClass(tag) + " ring-2 ring-primary/30"
+                        : "bg-background text-muted-foreground border-border hover:border-primary/40"
+                    }`}
+                  >
+                    {tag}
+                    {form.tags.includes(tag) && <X className="ml-1 h-3 w-3" />}
+                  </button>
+                ))}
+              </div>
+              <div className="flex gap-2 mt-1">
+                <Input
+                  value={customTag}
+                  onChange={(e) => setCustomTag(e.target.value)}
+                  placeholder="Custom tag..."
+                  className="h-8 text-xs"
+                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addCustomTag())}
+                />
+                <Button type="button" variant="outline" size="sm" className="h-8 text-xs" onClick={addCustomTag}>Add</Button>
+              </div>
+              {form.tags.filter((t) => !PRESET_TAGS.includes(t)).length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {form.tags.filter((t) => !PRESET_TAGS.includes(t)).map((tag) => (
+                    <span key={tag} className="inline-flex items-center rounded-full border border-border bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
+                      {tag}
+                      <button type="button" onClick={() => toggleTag(tag)} className="ml-1"><X className="h-3 w-3" /></button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <div className="space-y-2">
               <Label>Notes</Label>
               <Textarea value={form.notes} onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))} placeholder="Any notes about this customer..." rows={3} />
