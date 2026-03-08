@@ -76,7 +76,7 @@ const FeaturedCollections = () => {
             >
               <Link
                 to={col.link}
-                className="group block relative overflow-hidden aspect-[3/4]"
+                className="group block relative overflow-hidden aspect-[3/4] rounded-sm"
               >
                 <img
                   src={col.image}
