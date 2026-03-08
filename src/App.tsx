@@ -36,6 +36,7 @@ import AdminAIInsights from "./pages/admin/AdminAIInsights";
 import AdminAIDescriptions from "./pages/admin/AdminAIDescriptions";
 import AdminAIChatbot from "./pages/admin/AdminAIChatbot";
 import AdminAIInventory from "./pages/admin/AdminAIInventory";
+import AdminProfile from "./pages/admin/AdminProfile";
 
 const queryClient = new QueryClient();
 
