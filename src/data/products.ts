@@ -15,6 +15,8 @@ export interface Product {
   isBestSeller?: boolean;
   isFeatured?: boolean;
   stock?: number;
+  gender?: "women" | "men";
+  sizes?: string[];
 }
 
 export const categories = [
@@ -28,6 +30,9 @@ export const categories = [
   "Veshti",
   "Combos",
 ];
+
+export const menswearCategories = ["Shirt", "Veshti", "Combos"];
+export const sareeCategories = ["Kanchipuram Silk", "Banarasi Silk", "Mysore Silk", "Tussar Silk", "Organza Silk", "Cotton Silk"];
 
 export const collections = [
   "Premavathi",
