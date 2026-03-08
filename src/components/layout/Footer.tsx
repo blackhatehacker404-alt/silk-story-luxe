@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useShopIdentity } from "@/hooks/useSiteSettings";
+import { Instagram, Facebook, Youtube } from "lucide-react";
 
 const Footer = () => {
   const { data: shop } = useShopIdentity();
