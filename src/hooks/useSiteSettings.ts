@@ -66,3 +66,35 @@ export function useUpdateBuyButtonConfig() {
     },
   });
 }
+
+export function useShopIdentity() {
+  return useQuery({
+    queryKey: ["site-settings", "shop_identity"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "shop_identity")
+        .single();
+      if (error || !data) return defaultShopIdentity;
+      return data.value as unknown as ShopIdentity;
+    },
+    staleTime: 60000,
+  });
+}
+
+export function useUpdateShopIdentity() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (identity: ShopIdentity) => {
+      const { error } = await supabase
+        .from("site_settings")
+        .update({ value: identity as any, updated_at: new Date().toISOString() })
+        .eq("key", "shop_identity");
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["site-settings", "shop_identity"] });
+    },
+  });
+}
