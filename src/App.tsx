@@ -11,6 +11,7 @@ import CartDrawer from "@/components/layout/CartDrawer";
 import AdminLayout from "@/components/admin/AdminLayout";
 import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import ProtectedAdminRoute from "@/components/auth/ProtectedAdminRoute";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
