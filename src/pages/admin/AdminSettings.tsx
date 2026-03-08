@@ -14,6 +14,9 @@ import {
   useThemeColors,
   useUpdateThemeColors,
   ThemeColors,
+  useAboutStats,
+  useUpdateAboutStats,
+  AboutStat,
 } from "@/hooks/useSiteSettings";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
