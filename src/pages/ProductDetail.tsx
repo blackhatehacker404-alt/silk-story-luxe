@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ShoppingBag, Zap, Share2, ChevronLeft, Heart, MessageCircle } from "lucide-react";
@@ -14,8 +15,10 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
   const { data: buyConfig } = useBuyButtonConfig();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const [selectedSize, setSelectedSize] = useState<string>("");
 
   const product = products.find((p) => p.id === id);
+  const hasSizes = product?.sizes && product.sizes.length > 0;
 
   if (!product) {
     return (
@@ -110,10 +113,42 @@ const ProductDetail = () => {
               </div>
             </div>
 
+            {/* Size Selection */}
+            {hasSizes && (
+              <div className="mb-8">
+                <h4 className="text-xs tracking-[0.15em] uppercase text-accent mb-3 font-body">Select Size</h4>
+                <div className="flex flex-wrap gap-2">
+                  {product.sizes!.map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedSize(size)}
+                      className={`min-w-[3rem] px-4 py-2.5 text-sm font-body border transition-colors ${
+                        selectedSize === size
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "border-border text-foreground hover:border-accent"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+                {!selectedSize && (
+                  <p className="text-xs text-muted-foreground mt-2 font-body">Please select a size</p>
+                )}
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div className="flex flex-col gap-3">
               <button
-                onClick={() => { addToCart(product); toast.success("Added to your bag"); }}
+                onClick={() => {
+                  if (hasSizes && !selectedSize) {
+                    toast.error("Please select a size");
+                    return;
+                  }
+                  addToCart(product);
+                  toast.success("Added to your bag");
+                }}
                 className="w-full py-4 bg-primary text-primary-foreground text-sm tracking-[0.2em] uppercase font-body hover:opacity-90 transition-all flex items-center justify-center gap-3"
               >
                 <ShoppingBag size={18} /> Add to Cart
