@@ -17,6 +17,9 @@ export interface ShopIdentity {
   state: string;
   pincode: string;
   logo_url?: string;
+  instagram_url?: string;
+  facebook_url?: string;
+  youtube_url?: string;
 }
 
 const defaultConfig: BuyButtonConfig = {

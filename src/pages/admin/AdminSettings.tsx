@@ -208,6 +208,25 @@ export default function AdminSettings() {
               />
             </div>
           </div>
+          {/* Social Media Links */}
+          <div className="pt-2">
+            <Label className="mb-3 block text-sm font-medium">Social Media Links</Label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Instagram URL</Label>
+                <Input value={localIdentity.instagram_url ?? ""} onChange={(e) => setLocalIdentity((p) => ({ ...p, instagram_url: e.target.value }))} placeholder="https://instagram.com/yourshop" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Facebook URL</Label>
+                <Input value={localIdentity.facebook_url ?? ""} onChange={(e) => setLocalIdentity((p) => ({ ...p, facebook_url: e.target.value }))} placeholder="https://facebook.com/yourshop" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">YouTube URL</Label>
+                <Input value={localIdentity.youtube_url ?? ""} onChange={(e) => setLocalIdentity((p) => ({ ...p, youtube_url: e.target.value }))} placeholder="https://youtube.com/@yourshop" />
+              </div>
+            </div>
+          </div>
+
           <div className="pt-2">
             <Label className="flex items-center gap-1.5 mb-3"><MapPin className="h-3.5 w-3.5" /> From / Return Address</Label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

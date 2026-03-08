@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useShopIdentity } from "@/hooks/useSiteSettings";
+import { Instagram, Facebook, Youtube } from "lucide-react";
 
 const Footer = () => {
   const { data: shop } = useShopIdentity();
@@ -50,6 +51,25 @@ const Footer = () => {
               <p>{shop?.state ?? "Tamil Nadu"}, India — {shop?.pincode ?? "637502"}</p>
               <p>{shop?.phone ?? "+91 98765 43210"}</p>
               <p>{shop?.email ?? "info@kalaifashions.com"}</p>
+              {(shop?.instagram_url || shop?.facebook_url || shop?.youtube_url) && (
+                <div className="flex items-center gap-3 pt-2">
+                  {shop?.instagram_url && (
+                    <a href={shop.instagram_url} target="_blank" rel="noopener noreferrer" className="hover:opacity-100 transition-opacity" aria-label="Instagram">
+                      <Instagram size={18} />
+                    </a>
+                  )}
+                  {shop?.facebook_url && (
+                    <a href={shop.facebook_url} target="_blank" rel="noopener noreferrer" className="hover:opacity-100 transition-opacity" aria-label="Facebook">
+                      <Facebook size={18} />
+                    </a>
+                  )}
+                  {shop?.youtube_url && (
+                    <a href={shop.youtube_url} target="_blank" rel="noopener noreferrer" className="hover:opacity-100 transition-opacity" aria-label="YouTube">
+                      <Youtube size={18} />
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
