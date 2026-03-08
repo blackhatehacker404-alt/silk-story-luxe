@@ -125,7 +125,7 @@ const ProductsPage = () => {
                   Category
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {categories.map((cat) => (
+                  {sareeCategories.map((cat) => (
                     <button
                       key={cat}
                       onClick={() =>
