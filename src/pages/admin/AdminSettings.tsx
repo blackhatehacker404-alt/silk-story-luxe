@@ -74,6 +74,8 @@ export default function AdminSettings() {
   const updateIdentity = useUpdateShopIdentity();
   const { data: themeColors, isLoading: loadingTheme } = useThemeColors();
   const updateTheme = useUpdateThemeColors();
+  const { data: aboutStats, isLoading: loadingStats } = useAboutStats();
+  const updateStats = useUpdateAboutStats();
 
   const [localConfig, setLocalConfig] = useState<BuyButtonConfig>({
     online_payment_enabled: true,
@@ -98,6 +100,12 @@ export default function AdminSettings() {
     background: "#ffffff",
   });
 
+  const [localStats, setLocalStats] = useState<AboutStat[]>([
+    { number: "500+", label: "Sarees Crafted" },
+    { number: "₹999", label: "Starting Price" },
+    { number: "50+", label: "Artisan Partners" },
+  ]);
+
   useEffect(() => {
     if (config) setLocalConfig(config);
   }, [config]);
@@ -109,6 +117,10 @@ export default function AdminSettings() {
   useEffect(() => {
     if (themeColors) setLocalTheme(themeColors);
   }, [themeColors]);
+
+  useEffect(() => {
+    if (aboutStats) setLocalStats(aboutStats);
+  }, [aboutStats]);
 
   const handleSaveBuy = () => {
     updateConfig.mutate(localConfig, {
@@ -131,7 +143,14 @@ export default function AdminSettings() {
     });
   };
 
-  if (loadingBuy || loadingIdentity || loadingTheme)
+  const handleSaveStats = () => {
+    updateStats.mutate(localStats, {
+      onSuccess: () => toast.success("About page stats saved"),
+      onError: () => toast.error("Failed to save stats"),
+    });
+  };
+
+  if (loadingBuy || loadingIdentity || loadingTheme || loadingStats)
     return <div className="p-8 text-muted-foreground">Loading settings...</div>;
 
   return (
