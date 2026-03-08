@@ -1,4 +1,5 @@
 import { formatPrice } from "@/data/products";
+import type { ShopIdentity } from "@/hooks/useSiteSettings";
 
 interface InvoiceItem {
   name: string;
@@ -24,9 +25,15 @@ interface InvoiceData {
   totalAmount: number;
   paymentStatus: string;
   paymentMethod?: string;
+  shopIdentity?: ShopIdentity;
 }
 
 export function generateInvoicePDF(data: InvoiceData) {
+  const s = data.shopIdentity;
+  const brandName = s?.shop_name?.toUpperCase() ?? "KALAI FASHIONS";
+  const brandTagline = s?.tagline ? `Manufactured in ${s.tagline}` : "Manufactured in Elampillai";
+  const brandPhone = s?.phone ?? "+91 88702 26867";
+
   const itemRows = data.items
     .map(
       (item, i) => `
@@ -72,8 +79,8 @@ export function generateInvoicePDF(data: InvoiceData) {
     <body>
       <div class="header">
         <div>
-          <div class="brand">KALAI FASHIONS</div>
-          <div class="brand-sub">Manufactured in Elampillai</div>
+          <div class="brand">${brandName}</div>
+          <div class="brand-sub">${brandTagline}</div>
         </div>
         <div>
           <div class="invoice-title">INVOICE</div>
@@ -118,8 +125,8 @@ export function generateInvoicePDF(data: InvoiceData) {
       </table>
 
       <div class="footer">
-        <p>Thank you for shopping with Kalai Fashions!</p>
-        <p>For any queries, contact us on WhatsApp: +91 88702 26867</p>
+        <p>Thank you for shopping with ${s?.shop_name ?? "Kalai Fashions"}!</p>
+        <p>For any queries, contact us on WhatsApp: ${brandPhone}</p>
       </div>
     </body>
     </html>

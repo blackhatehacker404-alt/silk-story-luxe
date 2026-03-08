@@ -1,3 +1,5 @@
+import type { ShopIdentity } from "@/hooks/useSiteSettings";
+
 interface ShippingLabelData {
   orderNumber: string;
   customerName: string;
@@ -12,9 +14,10 @@ interface ShippingLabelData {
     pincode: string;
   };
   items: { name: string; quantity: number }[];
+  shopIdentity?: ShopIdentity;
 }
 
-const BRAND_ADDRESS = {
+const DEFAULT_BRAND = {
   name: "KALAI FASHIONS",
   line1: "Elampillai",
   city: "Salem",
@@ -24,6 +27,16 @@ const BRAND_ADDRESS = {
 };
 
 export function generateShippingLabel(data: ShippingLabelData) {
+  const s = data.shopIdentity;
+  const brand = {
+    name: s?.shop_name?.toUpperCase() ?? DEFAULT_BRAND.name,
+    line1: s?.address_line1 ?? DEFAULT_BRAND.line1,
+    city: s?.city ?? DEFAULT_BRAND.city,
+    state: s?.state ?? DEFAULT_BRAND.state,
+    pincode: s?.pincode ?? DEFAULT_BRAND.pincode,
+    phone: s?.phone ?? DEFAULT_BRAND.phone,
+  };
+
   const addr = data.address;
   const toLine1 = addr.line1 || addr.address_line1 || "";
   const toLine2 = addr.line2 || addr.address_line2 || "";
@@ -32,7 +45,6 @@ export function generateShippingLabel(data: ShippingLabelData) {
     .map((i) => `<span style="display:block;font-size:9px;color:#444;">${i.name} × ${i.quantity}</span>`)
     .join("");
 
-  // 6x4 inches = 576x384 px at 96dpi
   const html = `
     <!DOCTYPE html>
     <html>
@@ -60,7 +72,7 @@ export function generateShippingLabel(data: ShippingLabelData) {
     </head>
     <body>
       <div class="header">
-        <div class="brand">KALAI FASHIONS</div>
+        <div class="brand">${brand.name}</div>
         <div class="order-id">${data.orderNumber}</div>
       </div>
 
@@ -81,12 +93,12 @@ export function generateShippingLabel(data: ShippingLabelData) {
 
           <div class="from-section">
             <div class="label">From</div>
-            <div style="font-size:11px;font-weight:700;">${BRAND_ADDRESS.name}</div>
+            <div style="font-size:11px;font-weight:700;">${brand.name}</div>
             <div class="addr">
-              ${BRAND_ADDRESS.line1}<br/>
-              ${BRAND_ADDRESS.city}, ${BRAND_ADDRESS.state} - ${BRAND_ADDRESS.pincode}
+              ${brand.line1}<br/>
+              ${brand.city}, ${brand.state} - ${brand.pincode}
             </div>
-            <div class="phone">${BRAND_ADDRESS.phone}</div>
+            <div class="phone">${brand.phone}</div>
           </div>
         </div>
 
