@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-
+import { useAboutStats } from "@/hooks/useSiteSettings";
 const BrandStory = () => {
   return (
     <section className="py-20 lg:py-28 bg-secondary">
