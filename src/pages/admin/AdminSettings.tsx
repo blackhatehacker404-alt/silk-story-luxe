@@ -15,8 +15,9 @@ import {
   useUpdateThemeColors,
   ThemeColors,
 } from "@/hooks/useSiteSettings";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Settings, CreditCard, MessageCircle, Save, Store, MapPin, Mail, Phone, Palette } from "lucide-react";
+import { Settings, CreditCard, MessageCircle, Save, Store, MapPin, Mail, Phone, Palette, Upload, X, Loader2, ImageIcon } from "lucide-react";
 
 const PRESET_PALETTES = [
   { label: "Classic Black", primary: "#141414", accent: "#141414", background: "#ffffff" },
@@ -26,6 +27,42 @@ const PRESET_PALETTES = [
   { label: "Warm Bronze", primary: "#5c3d1e", accent: "#8b6b3d", background: "#fdfaf5" },
   { label: "Plum Purple", primary: "#3d1f4e", accent: "#5a2d7a", background: "#faf5fc" },
 ];
+
+function LogoUploader({ onUploaded }: { onUploaded: (url: string) => void }) {
+  const [uploading, setUploading] = useState(false);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const path = `logo/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("brand-assets").upload(path, file, { upsert: true });
+    if (error) {
+      toast.error("Upload failed");
+      setUploading(false);
+      return;
+    }
+    const { data } = supabase.storage.from("brand-assets").getPublicUrl(path);
+    onUploaded(data.publicUrl);
+    setUploading(false);
+    e.target.value = "";
+  };
+
+  return (
+    <label className="h-16 w-32 rounded border-2 border-dashed border-border flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors">
+      {uploading ? (
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      ) : (
+        <>
+          <Upload className="h-4 w-4 text-muted-foreground" />
+          <span className="text-[10px] text-muted-foreground mt-1">Upload Logo</span>
+        </>
+      )}
+      <input type="file" accept="image/*" onChange={handleUpload} className="hidden" disabled={uploading} />
+    </label>
+  );
+}
 
 export default function AdminSettings() {
   const { data: config, isLoading: loadingBuy } = useBuyButtonConfig();
@@ -113,6 +150,28 @@ export default function AdminSettings() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Logo Upload */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-1.5"><ImageIcon className="h-3.5 w-3.5" /> Brand Logo</Label>
+            <div className="flex items-center gap-4">
+              {localIdentity.logo_url ? (
+                <div className="relative h-16 w-32 rounded border border-border overflow-hidden group bg-muted flex items-center justify-center">
+                  <img src={localIdentity.logo_url} alt="Logo" className="max-h-full max-w-full object-contain" />
+                  <button
+                    type="button"
+                    onClick={() => setLocalIdentity((p) => ({ ...p, logo_url: "" }))}
+                    className="absolute top-0.5 right-0.5 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ) : (
+                <LogoUploader onUploaded={(url) => setLocalIdentity((p) => ({ ...p, logo_url: url }))} />
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">Recommended: PNG with transparent background, max 200×80px</p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Shop Name</Label>

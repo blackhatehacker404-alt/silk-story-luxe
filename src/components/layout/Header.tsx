@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { ShoppingBag, Menu, X, Search, User, Shield, Heart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useShopIdentity } from "@/hooks/useSiteSettings";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
@@ -17,6 +18,7 @@ const Header = () => {
   const { totalItems, setIsCartOpen } = useCart();
   const { user, isAdmin } = useAuth();
   const location = useLocation();
+  const { data: shop } = useShopIdentity();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
@@ -32,13 +34,22 @@ const Header = () => {
           </button>
 
           {/* Logo */}
-          <Link to="/" className="flex flex-col items-center">
-            <h1 className="text-xl lg:text-2xl font-heading tracking-wide text-foreground">
-              Kalai Fashions
-            </h1>
-            <span className="text-[9px] lg:text-[10px] tracking-[0.3em] uppercase text-muted-foreground font-body">
-              Elampillai
-            </span>
+          <Link to="/" className="flex items-center gap-2.5">
+            {shop?.logo_url && (
+              <img
+                src={shop.logo_url}
+                alt={shop?.shop_name ?? "Logo"}
+                className="h-8 lg:h-10 w-auto object-contain"
+              />
+            )}
+            <div className="flex flex-col items-center">
+              <h1 className="text-xl lg:text-2xl font-heading tracking-wide text-foreground">
+                {shop?.shop_name ?? "Kalai Fashions"}
+              </h1>
+              <span className="text-[9px] lg:text-[10px] tracking-[0.3em] uppercase text-muted-foreground font-body">
+                {shop?.tagline ?? "Elampillai"}
+              </span>
+            </div>
           </Link>
 
           {/* Desktop navigation */}
