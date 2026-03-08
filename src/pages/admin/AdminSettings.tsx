@@ -114,6 +114,28 @@ export default function AdminSettings() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Logo Upload */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-1.5"><ImageIcon className="h-3.5 w-3.5" /> Brand Logo</Label>
+            <div className="flex items-center gap-4">
+              {localIdentity.logo_url ? (
+                <div className="relative h-16 w-32 rounded border border-border overflow-hidden group bg-muted flex items-center justify-center">
+                  <img src={localIdentity.logo_url} alt="Logo" className="max-h-full max-w-full object-contain" />
+                  <button
+                    type="button"
+                    onClick={() => setLocalIdentity((p) => ({ ...p, logo_url: "" }))}
+                    className="absolute top-0.5 right-0.5 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ) : (
+                <LogoUploader onUploaded={(url) => setLocalIdentity((p) => ({ ...p, logo_url: url }))} />
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">Recommended: PNG with transparent background, max 200×80px</p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Shop Name</Label>
