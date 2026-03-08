@@ -78,6 +78,7 @@ function AppContent() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       {!isAdmin && <Footer />}
+      {!isAdmin && <WhatsAppButton />}
     </>
   );
 }
