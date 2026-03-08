@@ -39,6 +39,7 @@ const allStatuses = ["all", "new", "processing", "shipped", "delivered"] as cons
 export default function AdminOrders() {
   const { data: orders = [], isLoading } = useAdminOrders();
   const updateStatus = useUpdateOrderStatus();
+  const { data: shopIdentity } = useShopIdentity();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedOrder, setSelectedOrder] = useState<OrderRow | null>(null);
