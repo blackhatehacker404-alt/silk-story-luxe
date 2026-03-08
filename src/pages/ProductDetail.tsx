@@ -15,8 +15,10 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
   const { data: buyConfig } = useBuyButtonConfig();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const [selectedSize, setSelectedSize] = useState<string>("");
 
   const product = products.find((p) => p.id === id);
+  const hasSizes = product?.sizes && product.sizes.length > 0;
 
   if (!product) {
     return (
