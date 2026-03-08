@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import collectionBridal from "@/assets/collection-bridal.jpg";
 import collectionFestival from "@/assets/collection-festival.jpg";
 import collectionContemporary from "@/assets/collection-contemporary.jpg";
+import collectionMenswear from "@/assets/collection-menswear.jpg";
 
 const collections = [
   {
@@ -23,6 +24,12 @@ const collections = [
     subtitle: "Modern Meets Tradition",
     image: collectionContemporary,
     link: "/products?collection=Contemporary Elegance",
+  },
+  {
+    title: "Men's Wear",
+    subtitle: "Traditional Elegance for Him",
+    image: collectionMenswear,
+    link: "/menswear",
   },
 ];
 
