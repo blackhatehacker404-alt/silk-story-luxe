@@ -14,10 +14,13 @@ import {
   useThemeColors,
   useUpdateThemeColors,
   ThemeColors,
+  useAboutStats,
+  useUpdateAboutStats,
+  AboutStat,
 } from "@/hooks/useSiteSettings";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Settings, CreditCard, MessageCircle, Save, Store, MapPin, Mail, Phone, Palette, Upload, X, Loader2, ImageIcon } from "lucide-react";
+import { Settings, CreditCard, MessageCircle, Save, Store, MapPin, Mail, Phone, Palette, Upload, X, Loader2, ImageIcon, BarChart3, Plus, Trash2 } from "lucide-react";
 
 const PRESET_PALETTES = [
   { label: "Classic Black", primary: "#141414", accent: "#141414", background: "#ffffff" },
@@ -71,6 +74,8 @@ export default function AdminSettings() {
   const updateIdentity = useUpdateShopIdentity();
   const { data: themeColors, isLoading: loadingTheme } = useThemeColors();
   const updateTheme = useUpdateThemeColors();
+  const { data: aboutStats, isLoading: loadingStats } = useAboutStats();
+  const updateStats = useUpdateAboutStats();
 
   const [localConfig, setLocalConfig] = useState<BuyButtonConfig>({
     online_payment_enabled: true,
@@ -95,6 +100,12 @@ export default function AdminSettings() {
     background: "#ffffff",
   });
 
+  const [localStats, setLocalStats] = useState<AboutStat[]>([
+    { number: "500+", label: "Sarees Crafted" },
+    { number: "₹999", label: "Starting Price" },
+    { number: "50+", label: "Artisan Partners" },
+  ]);
+
   useEffect(() => {
     if (config) setLocalConfig(config);
   }, [config]);
@@ -106,6 +117,10 @@ export default function AdminSettings() {
   useEffect(() => {
     if (themeColors) setLocalTheme(themeColors);
   }, [themeColors]);
+
+  useEffect(() => {
+    if (aboutStats) setLocalStats(aboutStats);
+  }, [aboutStats]);
 
   const handleSaveBuy = () => {
     updateConfig.mutate(localConfig, {
@@ -128,7 +143,14 @@ export default function AdminSettings() {
     });
   };
 
-  if (loadingBuy || loadingIdentity || loadingTheme)
+  const handleSaveStats = () => {
+    updateStats.mutate(localStats, {
+      onSuccess: () => toast.success("About page stats saved"),
+      onError: () => toast.error("Failed to save stats"),
+    });
+  };
+
+  if (loadingBuy || loadingIdentity || loadingTheme || loadingStats)
     return <div className="p-8 text-muted-foreground">Loading settings...</div>;
 
   return (
@@ -255,7 +277,72 @@ export default function AdminSettings() {
         </CardContent>
       </Card>
 
-      {/* Theme Colors */}
+      {/* About Page Stats */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-heading flex items-center gap-2">
+            <BarChart3 className="h-5 w-5" /> About Page Stats
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-xs text-muted-foreground">These stats appear on the About page and homepage Brand Story section.</p>
+          {localStats.map((stat, i) => (
+            <div key={i} className="flex items-end gap-3">
+              <div className="space-y-1 flex-1">
+                <Label className="text-xs text-muted-foreground">Number/Value</Label>
+                <Input
+                  value={stat.number}
+                  onChange={(e) => {
+                    const updated = [...localStats];
+                    updated[i] = { ...updated[i], number: e.target.value };
+                    setLocalStats(updated);
+                  }}
+                  placeholder="500+"
+                />
+              </div>
+              <div className="space-y-1 flex-1">
+                <Label className="text-xs text-muted-foreground">Label</Label>
+                <Input
+                  value={stat.label}
+                  onChange={(e) => {
+                    const updated = [...localStats];
+                    updated[i] = { ...updated[i], label: e.target.value };
+                    setLocalStats(updated);
+                  }}
+                  placeholder="Sarees Crafted"
+                />
+              </div>
+              {localStats.length > 1 && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setLocalStats(localStats.filter((_, idx) => idx !== i))}
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          ))}
+          {localStats.length < 6 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setLocalStats([...localStats, { number: "", label: "" }])}
+              className="gap-1"
+            >
+              <Plus className="h-3.5 w-3.5" /> Add Stat
+            </Button>
+          )}
+          <div>
+            <Button onClick={handleSaveStats} disabled={updateStats.isPending} className="gap-2">
+              <Save className="h-4 w-4" />
+              {updateStats.isPending ? "Saving..." : "Save Stats"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="text-lg font-heading flex items-center gap-2">

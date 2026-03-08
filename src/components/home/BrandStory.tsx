@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-
+import { useAboutStats } from "@/hooks/useSiteSettings";
 const BrandStory = () => {
+  const { data: stats } = useAboutStats();
   return (
     <section className="py-20 lg:py-28 bg-secondary">
       <div className="container mx-auto px-4 lg:px-8">
@@ -32,11 +33,7 @@ const BrandStory = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="grid grid-cols-3 gap-8 mt-16"
           >
-            {[
-              { number: "500+", label: "Sarees Crafted" },
-              { number: "₹999", label: "Starting Price" },
-              { number: "50+", label: "Artisan Partners" },
-            ].map((stat) => (
+            {(stats ?? []).map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="text-2xl lg:text-4xl font-heading mb-2">
                   {stat.number}

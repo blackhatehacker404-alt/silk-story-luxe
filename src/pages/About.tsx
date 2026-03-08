@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
-import { useShopIdentity } from "@/hooks/useSiteSettings";
+import { useShopIdentity, useAboutStats } from "@/hooks/useSiteSettings";
 import { MapPin, Phone, Mail, Instagram, Facebook, Youtube } from "lucide-react";
 
 const About = () => {
   const { data: shop } = useShopIdentity();
+  const { data: stats } = useAboutStats();
 
   return (
     <main className="min-h-screen pt-20">
@@ -70,11 +71,7 @@ const About = () => {
             transition={{ duration: 0.8 }}
             className="grid grid-cols-3 gap-8 max-w-2xl mx-auto"
           >
-            {[
-              { number: "500+", label: "Sarees Crafted" },
-              { number: "₹999", label: "Starting Price" },
-              { number: "50+", label: "Artisan Partners" },
-            ].map((stat) => (
+            {(stats ?? []).map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="text-2xl lg:text-4xl font-heading mb-2">{stat.number}</div>
                 <div className="text-xs tracking-[0.15em] uppercase text-muted-foreground font-body">
