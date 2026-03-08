@@ -10,6 +10,10 @@ import {
   Settings,
   ClipboardList,
   Ticket,
+  Sparkles,
+  Wand2,
+  Bot,
+  PackageSearch,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -35,6 +39,13 @@ const mainNav = [
 
 const mainNav2 = [
   { title: "Manual Order", url: "/admin/manual-order", icon: ClipboardList },
+];
+
+const aiNav = [
+  { title: "Sales Insights", url: "/admin/ai-insights", icon: Sparkles },
+  { title: "Description Gen", url: "/admin/ai-descriptions", icon: Wand2 },
+  { title: "AI Assistant", url: "/admin/ai-chatbot", icon: Bot },
+  { title: "Smart Inventory", url: "/admin/ai-inventory", icon: PackageSearch },
 ];
 
 const settingsNav = [
@@ -103,6 +114,34 @@ export default function AdminSidebar() {
                 </SidebarMenuItem>
               ))}
               {mainNav2.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive(item.url)}
+                    tooltip={item.title}
+                  >
+                    <NavLink
+                      to={item.url}
+                      className="flex items-center gap-3"
+                      activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+                    >
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.title}</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-sidebar-foreground/50 text-xs uppercase tracking-widest">
+            AI Tools
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {aiNav.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
