@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ShoppingBag, Zap, Share2, ChevronLeft, Heart, MessageCircle } from "lucide-react";
