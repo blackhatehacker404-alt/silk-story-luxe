@@ -104,6 +104,7 @@ export default function AdminOrders() {
       address: addr, items: getOrderItems(order),
       totalAmount: order.total_amount, paymentStatus: order.payment_status,
       paymentMethod: order.payment_method || undefined,
+      shopIdentity,
     });
   };
 
@@ -115,6 +116,7 @@ export default function AdminOrders() {
       customerPhone: addr?.customer_phone || addr?.phone || "",
       address: addr,
       items: getOrderItems(order),
+      shopIdentity,
     });
   };
 
