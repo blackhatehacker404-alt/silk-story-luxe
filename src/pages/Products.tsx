@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { SlidersHorizontal, X } from "lucide-react";
-import { products, categories, collections } from "@/data/products";
+import { products, sareeCategories, collections } from "@/data/products";
 import ProductCard from "@/components/products/ProductCard";
 
 const sortOptions = [
