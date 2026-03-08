@@ -13,6 +13,7 @@ const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { addToCart } = useCart();
   const { data: buyConfig } = useBuyButtonConfig();
+  const { toggleWishlist, isInWishlist } = useWishlist();
 
   const product = products.find((p) => p.id === id);
 
