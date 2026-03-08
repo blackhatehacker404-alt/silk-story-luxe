@@ -11,15 +11,29 @@ import {
   useShopIdentity,
   useUpdateShopIdentity,
   ShopIdentity,
+  useThemeColors,
+  useUpdateThemeColors,
+  ThemeColors,
 } from "@/hooks/useSiteSettings";
 import { toast } from "sonner";
-import { Settings, CreditCard, MessageCircle, Save, Store, MapPin, Mail, Phone } from "lucide-react";
+import { Settings, CreditCard, MessageCircle, Save, Store, MapPin, Mail, Phone, Palette } from "lucide-react";
+
+const PRESET_PALETTES = [
+  { label: "Classic Black", primary: "#141414", accent: "#141414", background: "#ffffff" },
+  { label: "Deep Maroon", primary: "#6b1d2a", accent: "#8b2d3a", background: "#fffaf5" },
+  { label: "Royal Navy", primary: "#1a2744", accent: "#2a3f6e", background: "#f8f9fc" },
+  { label: "Forest Green", primary: "#1a3c2a", accent: "#2d5a40", background: "#f5faf7" },
+  { label: "Warm Bronze", primary: "#5c3d1e", accent: "#8b6b3d", background: "#fdfaf5" },
+  { label: "Plum Purple", primary: "#3d1f4e", accent: "#5a2d7a", background: "#faf5fc" },
+];
 
 export default function AdminSettings() {
   const { data: config, isLoading: loadingBuy } = useBuyButtonConfig();
   const updateConfig = useUpdateBuyButtonConfig();
   const { data: identity, isLoading: loadingIdentity } = useShopIdentity();
   const updateIdentity = useUpdateShopIdentity();
+  const { data: themeColors, isLoading: loadingTheme } = useThemeColors();
+  const updateTheme = useUpdateThemeColors();
 
   const [localConfig, setLocalConfig] = useState<BuyButtonConfig>({
     online_payment_enabled: true,
@@ -38,6 +52,12 @@ export default function AdminSettings() {
     pincode: "637502",
   });
 
+  const [localTheme, setLocalTheme] = useState<ThemeColors>({
+    primary: "#141414",
+    accent: "#141414",
+    background: "#ffffff",
+  });
+
   useEffect(() => {
     if (config) setLocalConfig(config);
   }, [config]);
@@ -45,6 +65,10 @@ export default function AdminSettings() {
   useEffect(() => {
     if (identity) setLocalIdentity(identity);
   }, [identity]);
+
+  useEffect(() => {
+    if (themeColors) setLocalTheme(themeColors);
+  }, [themeColors]);
 
   const handleSaveBuy = () => {
     updateConfig.mutate(localConfig, {
@@ -60,7 +84,14 @@ export default function AdminSettings() {
     });
   };
 
-  if (loadingBuy || loadingIdentity)
+  const handleSaveTheme = () => {
+    updateTheme.mutate(localTheme, {
+      onSuccess: () => toast.success("Theme colors saved — changes will apply across the site"),
+      onError: () => toast.error("Failed to save theme"),
+    });
+  };
+
+  if (loadingBuy || loadingIdentity || loadingTheme)
     return <div className="p-8 text-muted-foreground">Loading settings...</div>;
 
   return (
@@ -70,7 +101,7 @@ export default function AdminSettings() {
           <Settings className="h-6 w-6" /> Store Settings
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Manage your shop identity, location, and storefront options
+          Manage your shop identity, theme, and storefront options
         </p>
       </div>
 
@@ -87,9 +118,7 @@ export default function AdminSettings() {
               <Label>Shop Name</Label>
               <Input
                 value={localIdentity.shop_name}
-                onChange={(e) =>
-                  setLocalIdentity((p) => ({ ...p, shop_name: e.target.value }))
-                }
+                onChange={(e) => setLocalIdentity((p) => ({ ...p, shop_name: e.target.value }))}
                 placeholder="Kalai Fashions"
               />
             </div>
@@ -97,96 +126,167 @@ export default function AdminSettings() {
               <Label>Tagline / Subtitle</Label>
               <Input
                 value={localIdentity.tagline}
-                onChange={(e) =>
-                  setLocalIdentity((p) => ({ ...p, tagline: e.target.value }))
-                }
+                onChange={(e) => setLocalIdentity((p) => ({ ...p, tagline: e.target.value }))}
                 placeholder="Elampillai"
               />
             </div>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="flex items-center gap-1.5">
-                <Mail className="h-3.5 w-3.5" /> Email
-              </Label>
+              <Label className="flex items-center gap-1.5"><Mail className="h-3.5 w-3.5" /> Email</Label>
               <Input
                 value={localIdentity.email}
-                onChange={(e) =>
-                  setLocalIdentity((p) => ({ ...p, email: e.target.value }))
-                }
+                onChange={(e) => setLocalIdentity((p) => ({ ...p, email: e.target.value }))}
                 placeholder="info@kalaifashions.com"
               />
             </div>
             <div className="space-y-2">
-              <Label className="flex items-center gap-1.5">
-                <Phone className="h-3.5 w-3.5" /> Phone
-              </Label>
+              <Label className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> Phone</Label>
               <Input
                 value={localIdentity.phone}
-                onChange={(e) =>
-                  setLocalIdentity((p) => ({ ...p, phone: e.target.value }))
-                }
+                onChange={(e) => setLocalIdentity((p) => ({ ...p, phone: e.target.value }))}
                 placeholder="+91 88702 26867"
               />
             </div>
           </div>
-
           <div className="pt-2">
-            <Label className="flex items-center gap-1.5 mb-3">
-              <MapPin className="h-3.5 w-3.5" /> From / Return Address
-            </Label>
+            <Label className="flex items-center gap-1.5 mb-3"><MapPin className="h-3.5 w-3.5" /> From / Return Address</Label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label className="text-xs text-muted-foreground">Address Line</Label>
-                <Input
-                  value={localIdentity.address_line1}
-                  onChange={(e) =>
-                    setLocalIdentity((p) => ({ ...p, address_line1: e.target.value }))
-                  }
-                  placeholder="Street / Area"
-                />
+                <Input value={localIdentity.address_line1} onChange={(e) => setLocalIdentity((p) => ({ ...p, address_line1: e.target.value }))} placeholder="Street / Area" />
               </div>
               <div className="space-y-2">
                 <Label className="text-xs text-muted-foreground">City</Label>
-                <Input
-                  value={localIdentity.city}
-                  onChange={(e) =>
-                    setLocalIdentity((p) => ({ ...p, city: e.target.value }))
-                  }
-                  placeholder="Salem"
-                />
+                <Input value={localIdentity.city} onChange={(e) => setLocalIdentity((p) => ({ ...p, city: e.target.value }))} placeholder="Salem" />
               </div>
               <div className="space-y-2">
                 <Label className="text-xs text-muted-foreground">State</Label>
-                <Input
-                  value={localIdentity.state}
-                  onChange={(e) =>
-                    setLocalIdentity((p) => ({ ...p, state: e.target.value }))
-                  }
-                  placeholder="Tamil Nadu"
-                />
+                <Input value={localIdentity.state} onChange={(e) => setLocalIdentity((p) => ({ ...p, state: e.target.value }))} placeholder="Tamil Nadu" />
               </div>
               <div className="space-y-2">
                 <Label className="text-xs text-muted-foreground">Pincode</Label>
-                <Input
-                  value={localIdentity.pincode}
-                  onChange={(e) =>
-                    setLocalIdentity((p) => ({ ...p, pincode: e.target.value }))
-                  }
-                  placeholder="637502"
-                />
+                <Input value={localIdentity.pincode} onChange={(e) => setLocalIdentity((p) => ({ ...p, pincode: e.target.value }))} placeholder="637502" />
+              </div>
+            </div>
+          </div>
+          <Button onClick={handleSaveIdentity} disabled={updateIdentity.isPending} className="gap-2 mt-2">
+            <Save className="h-4 w-4" />
+            {updateIdentity.isPending ? "Saving..." : "Save Identity"}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Theme Colors */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-heading flex items-center gap-2">
+            <Palette className="h-5 w-5" /> Theme Colors
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Preset palettes */}
+          <div>
+            <Label className="mb-3 block">Quick Presets</Label>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {PRESET_PALETTES.map((p) => (
+                <button
+                  key={p.label}
+                  onClick={() => setLocalTheme({ primary: p.primary, accent: p.accent, background: p.background })}
+                  className={`flex items-center gap-3 p-3 border rounded-lg text-left transition-all hover:shadow-md ${
+                    localTheme.primary === p.primary && localTheme.background === p.background
+                      ? "border-foreground ring-2 ring-foreground/20"
+                      : "border-border"
+                  }`}
+                >
+                  <div className="flex gap-1">
+                    <div className="w-5 h-5 rounded-full border border-border" style={{ background: p.primary }} />
+                    <div className="w-5 h-5 rounded-full border border-border" style={{ background: p.accent }} />
+                    <div className="w-5 h-5 rounded-full border border-border" style={{ background: p.background }} />
+                  </div>
+                  <span className="text-xs font-medium">{p.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Custom pickers */}
+          <div>
+            <Label className="mb-3 block">Custom Colors</Label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Primary</Label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="color"
+                    value={localTheme.primary}
+                    onChange={(e) => setLocalTheme((p) => ({ ...p, primary: e.target.value }))}
+                    className="w-10 h-10 rounded-md border border-border cursor-pointer"
+                  />
+                  <Input
+                    value={localTheme.primary}
+                    onChange={(e) => setLocalTheme((p) => ({ ...p, primary: e.target.value }))}
+                    className="font-mono text-xs"
+                    placeholder="#141414"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Accent</Label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="color"
+                    value={localTheme.accent}
+                    onChange={(e) => setLocalTheme((p) => ({ ...p, accent: e.target.value }))}
+                    className="w-10 h-10 rounded-md border border-border cursor-pointer"
+                  />
+                  <Input
+                    value={localTheme.accent}
+                    onChange={(e) => setLocalTheme((p) => ({ ...p, accent: e.target.value }))}
+                    className="font-mono text-xs"
+                    placeholder="#141414"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Background</Label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="color"
+                    value={localTheme.background}
+                    onChange={(e) => setLocalTheme((p) => ({ ...p, background: e.target.value }))}
+                    className="w-10 h-10 rounded-md border border-border cursor-pointer"
+                  />
+                  <Input
+                    value={localTheme.background}
+                    onChange={(e) => setLocalTheme((p) => ({ ...p, background: e.target.value }))}
+                    className="font-mono text-xs"
+                    placeholder="#ffffff"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          <Button
-            onClick={handleSaveIdentity}
-            disabled={updateIdentity.isPending}
-            className="gap-2 mt-2"
-          >
+          {/* Preview */}
+          <div>
+            <Label className="mb-3 block text-xs text-muted-foreground">Preview</Label>
+            <div className="rounded-lg border border-border p-6 flex items-center gap-4" style={{ background: localTheme.background }}>
+              <div className="rounded-md px-5 py-2.5 text-sm font-medium" style={{ background: localTheme.primary, color: localTheme.background }}>
+                Buy Now
+              </div>
+              <div className="rounded-md px-5 py-2.5 text-sm font-medium border" style={{ background: localTheme.accent, color: localTheme.background }}>
+                Add to Cart
+              </div>
+              <span className="text-sm font-medium" style={{ color: localTheme.primary }}>
+                Sample Text
+              </span>
+            </div>
+          </div>
+
+          <Button onClick={handleSaveTheme} disabled={updateTheme.isPending} className="gap-2">
             <Save className="h-4 w-4" />
-            {updateIdentity.isPending ? "Saving..." : "Save Identity"}
+            {updateTheme.isPending ? "Saving..." : "Save Theme"}
           </Button>
         </CardContent>
       </Card>
@@ -202,50 +302,37 @@ export default function AdminSettings() {
               <CreditCard className="h-5 w-5 text-muted-foreground" />
               <div>
                 <Label className="font-medium">Online Payment (Buy Now)</Label>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Enable direct payment through the website
-                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">Enable direct payment through the website</p>
               </div>
             </div>
             <Switch
               checked={localConfig.online_payment_enabled}
-              onCheckedChange={(checked) =>
-                setLocalConfig((prev) => ({ ...prev, online_payment_enabled: checked }))
-              }
+              onCheckedChange={(checked) => setLocalConfig((prev) => ({ ...prev, online_payment_enabled: checked }))}
             />
           </div>
-
           <div className="flex items-center justify-between p-4 border border-border rounded-lg">
             <div className="flex items-center gap-3">
               <MessageCircle className="h-5 w-5 text-muted-foreground" />
               <div>
                 <Label className="font-medium">WhatsApp Order</Label>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Let customers order via WhatsApp chat
-                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">Let customers order via WhatsApp chat</p>
               </div>
             </div>
             <Switch
               checked={localConfig.whatsapp_enabled}
-              onCheckedChange={(checked) =>
-                setLocalConfig((prev) => ({ ...prev, whatsapp_enabled: checked }))
-              }
+              onCheckedChange={(checked) => setLocalConfig((prev) => ({ ...prev, whatsapp_enabled: checked }))}
             />
           </div>
-
           {localConfig.whatsapp_enabled && (
             <div className="pl-12 space-y-2">
               <Label>WhatsApp Number (with country code)</Label>
               <Input
                 value={localConfig.whatsapp_number}
-                onChange={(e) =>
-                  setLocalConfig((prev) => ({ ...prev, whatsapp_number: e.target.value }))
-                }
+                onChange={(e) => setLocalConfig((prev) => ({ ...prev, whatsapp_number: e.target.value }))}
                 placeholder="+918870226867"
               />
             </div>
           )}
-
           <Button onClick={handleSaveBuy} disabled={updateConfig.isPending} className="gap-2">
             <Save className="h-4 w-4" />
             {updateConfig.isPending ? "Saving..." : "Save Settings"}
