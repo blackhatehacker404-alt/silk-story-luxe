@@ -16,6 +16,7 @@ export interface ShopIdentity {
   city: string;
   state: string;
   pincode: string;
+  logo_url?: string;
 }
 
 const defaultConfig: BuyButtonConfig = {
