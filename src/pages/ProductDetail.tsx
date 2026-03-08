@@ -74,8 +74,12 @@ const ProductDetail = () => {
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="flex flex-col">
             <div className="flex items-start justify-between mb-2">
               <span className="text-xs tracking-[0.3em] uppercase text-accent font-body">{product.collection}</span>
-              <button className="p-2 text-muted-foreground hover:text-accent transition-colors" aria-label="Add to wishlist">
-                <Heart size={20} />
+              <button
+                onClick={() => toggleWishlist(product.id)}
+                className="p-2 text-muted-foreground hover:text-accent transition-colors"
+                aria-label="Add to wishlist"
+              >
+                <Heart size={20} className={isInWishlist(product.id) ? "fill-accent text-accent" : ""} />
               </button>
             </div>
 
