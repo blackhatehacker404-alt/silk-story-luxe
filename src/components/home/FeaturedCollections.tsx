@@ -95,14 +95,14 @@ const FeaturedCollections = () => {
                 </button>
 
                 <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-transparent to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-6 lg:p-8">
-                  <p className="text-xs tracking-[0.3em] uppercase text-accent mb-2 font-body">
+                <div className="absolute bottom-0 left-0 right-0 p-3 lg:p-8">
+                  <p className="text-[9px] lg:text-xs tracking-[0.3em] uppercase text-accent mb-1 lg:mb-2 font-body">
                     {col.subtitle}
                   </p>
-                  <h3 className="text-xl lg:text-2xl font-heading font-bold text-background mb-3">
+                  <h3 className="text-sm lg:text-2xl font-heading font-bold text-background mb-1 lg:mb-3">
                     {col.title}
                   </h3>
-                  <span className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-background/80 group-hover:text-accent transition-colors font-body">
+                  <span className="hidden lg:inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-background/80 group-hover:text-accent transition-colors font-body">
                     Explore <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
                   </span>
                 </div>
