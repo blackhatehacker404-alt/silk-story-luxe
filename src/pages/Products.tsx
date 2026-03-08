@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { SlidersHorizontal, X } from "lucide-react";
-import { products, categories, collections } from "@/data/products";
+import { products, sareeCategories, collections } from "@/data/products";
 import ProductCard from "@/components/products/ProductCard";
 
 const sortOptions = [
@@ -23,7 +23,7 @@ const ProductsPage = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   const filteredProducts = useMemo(() => {
-    let filtered = [...products];
+    let filtered = products.filter((p) => !p.gender || p.gender === "women");
 
     if (selectedCategory) {
       filtered = filtered.filter((p) => p.category === selectedCategory);
@@ -125,7 +125,7 @@ const ProductsPage = () => {
                   Category
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {categories.map((cat) => (
+                  {sareeCategories.map((cat) => (
                     <button
                       key={cat}
                       onClick={() =>

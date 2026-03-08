@@ -14,6 +14,7 @@ import ProtectedAdminRoute from "@/components/auth/ProtectedAdminRoute";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
+import Menswear from "./pages/Menswear";
 import Auth from "./pages/Auth";
 import AdminLogin from "./pages/AdminLogin";
 import UserDashboard from "./pages/UserDashboard";
@@ -51,6 +52,7 @@ function AppContent() {
         <Route path="/" element={<Index />} />
         <Route path="/products" element={<Products />} />
         <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/menswear" element={<Menswear />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/reset-password" element={<ResetPassword />} />
