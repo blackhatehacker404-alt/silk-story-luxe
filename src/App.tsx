@@ -84,6 +84,7 @@ function AppContent() {
           <Route path="ai-descriptions" element={<AdminAIDescriptions />} />
           <Route path="ai-chatbot" element={<AdminAIChatbot />} />
           <Route path="ai-inventory" element={<AdminAIInventory />} />
+          <Route path="profile" element={<AdminProfile />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />
