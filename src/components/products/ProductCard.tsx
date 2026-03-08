@@ -47,6 +47,15 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
             )}
           </div>
 
+          {/* Wishlist */}
+          <button
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWishlist(product.id); }}
+            className="absolute top-3 right-3 p-2 bg-background/80 backdrop-blur-sm rounded-full transition-all hover:scale-110"
+            aria-label="Toggle wishlist"
+          >
+            <Heart size={16} className={wishlisted ? "fill-accent text-accent" : "text-foreground"} />
+          </button>
+
           {/* Quick add */}
           <motion.button
             initial={{ opacity: 0, y: 10 }}
