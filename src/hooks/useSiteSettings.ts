@@ -103,6 +103,62 @@ export function useUpdateShopIdentity() {
   });
 }
 
+export interface AboutStat {
+  number: string;
+  label: string;
+}
+
+const defaultAboutStats: AboutStat[] = [
+  { number: "500+", label: "Sarees Crafted" },
+  { number: "₹999", label: "Starting Price" },
+  { number: "50+", label: "Artisan Partners" },
+];
+
+export function useAboutStats() {
+  return useQuery({
+    queryKey: ["site-settings", "about_stats"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "about_stats")
+        .single();
+      if (error || !data) return defaultAboutStats;
+      return data.value as unknown as AboutStat[];
+    },
+    staleTime: 60000,
+  });
+}
+
+export function useUpdateAboutStats() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (stats: AboutStat[]) => {
+      // Upsert: try update first, insert if not exists
+      const { data } = await supabase
+        .from("site_settings")
+        .select("id")
+        .eq("key", "about_stats")
+        .single();
+      if (data) {
+        const { error } = await supabase
+          .from("site_settings")
+          .update({ value: stats as any, updated_at: new Date().toISOString() })
+          .eq("key", "about_stats");
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("site_settings")
+          .insert({ key: "about_stats", value: stats as any });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["site-settings", "about_stats"] });
+    },
+  });
+}
+
 export interface ThemeColors {
   primary: string;
   accent: string;
