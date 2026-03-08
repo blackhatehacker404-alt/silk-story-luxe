@@ -36,6 +36,7 @@ import AdminAIInsights from "./pages/admin/AdminAIInsights";
 import AdminAIDescriptions from "./pages/admin/AdminAIDescriptions";
 import AdminAIChatbot from "./pages/admin/AdminAIChatbot";
 import AdminAIInventory from "./pages/admin/AdminAIInventory";
+import AdminProfile from "./pages/admin/AdminProfile";
 
 const queryClient = new QueryClient();
 
@@ -83,6 +84,7 @@ function AppContent() {
           <Route path="ai-descriptions" element={<AdminAIDescriptions />} />
           <Route path="ai-chatbot" element={<AdminAIChatbot />} />
           <Route path="ai-inventory" element={<AdminAIInventory />} />
+          <Route path="profile" element={<AdminProfile />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

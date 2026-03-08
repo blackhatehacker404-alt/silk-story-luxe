@@ -14,6 +14,7 @@ import {
   Wand2,
   Bot,
   PackageSearch,
+  UserCog,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -54,6 +55,7 @@ const settingsNav = [
   { title: "Coupons", url: "/admin/coupons", icon: Ticket },
   { title: "Reports", url: "/admin/reports", icon: FileText },
   { title: "Settings", url: "/admin/settings", icon: Settings },
+  { title: "Profile", url: "/admin/profile", icon: UserCog },
 ];
 
 export default function AdminSidebar() {
