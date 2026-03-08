@@ -12,6 +12,7 @@ import { useAdminOrders, useUpdateOrderStatus, OrderRow } from "@/hooks/useOrder
 import { formatPrice } from "@/data/products";
 import { generateInvoicePDF } from "@/utils/generateInvoice";
 import { generateShippingLabel } from "@/utils/generateShippingLabel";
+import { useShopIdentity } from "@/hooks/useSiteSettings";
 import { toast } from "sonner";
 
 const statusColors: Record<string, string> = {
